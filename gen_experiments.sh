@@ -9,6 +9,7 @@
 # * Generate job shell scripts in parallel
 # the directory layout this script uses is as follows.
 
+# ORIGINAL LAYOUT:
 # +-- ~/
 #      |-- .local/                                  // locally installed software
 #      |    +-- bin/
@@ -46,6 +47,43 @@
 #                |-- shuffle.txt                    // file to randomize the order of job steps
 #                |-- slurm-out.log                  // SLURM std err and std out
 #                +-- submit-jobs                    // script to submit all jobs
+
+# MODIFIED LAYOUT
+# +-- ~/
+#      |-- bin/                                     // locally installed software
+#      |    |-- memtime/bin/memtime
+#      |    |-- ltsminPerf/
+#      |    |    +-- bin/
+#      |    |         |-- pnml2lts-mc
+#      |    |         +-- pnml2lts-sym
+#      |    +-- ltsminStat/
+#      |         +-- bin/
+#      |              |-- pnml2lts-mc
+#      |              +-- pnml2lts-sym
+#      +-- experiments/
+#           |-- in/                                 // the models to experiment with
+#           |    |-- ptAll/
+#           |    |    |-- <a petri net definition>.pnml
+#           |    |    +-- ...
+#           |    +-- ptSelect/
+#           |         |-- <a petri net definition>.pnml
+#           |         +-- ...
+#           |-- out/                                // root directory of experiment output
+#           |    |-- 0/
+#           |    |    |-- <experiment_output>.dve2C // results of a dve experiment
+#           |    |    +-- ...
+#           |    +-- 1/failed                       // file which contains failed experiments
+#           +-- generated/
+#           |    |-- jobs/                          // contains job scripts (sbatch command with srun commands)
+#           |    |    |-- 0
+#           |    |    +-- ...
+#           |    |-- steps/                         // contains job step scripts; shell scripts to do an experiment
+#           |    |    |-- step_<uuid>.sh
+#           |    |    +-- ...
+#           |    |-- shuffle.txt                    // file to randomize the order of job steps
+#           |    +-- slurm-out.log                  // SLURM std err and std out
+#           |-- gen_experiments.sh                  // this file
+#           +-- submit_jobs.sh                      // script to submit all jobs
 
 POPTS_VERBOSE=$'--order=chain --next-union --saturation=sat-like --no-matrix -rsw,bg,bcm,hf,vf,sw,mm,sr,mm,sc,mm,vf --peak-nodes --graph-metrics\n'
 POPTS_VERBOSE+=$'--order=chain --next-union --saturation=sat-like --no-matrix -rsw,bg,bk,hf,vf,sw,mm,sr,mm,sc,mm,vf --peak-nodes --graph-metrics\n'
@@ -186,46 +224,51 @@ SLURM_CMAX=35
 
 # get the absolute path to the home directory
 HOME=$(eval echo ~)
+USER="s1083392"
 
-# paths to executables
-BIN="$HOME/.local/bin"
+# general path to executables
+BIN="$HOME/bin"
 
-# path to executables producing stats
-STATS="$HOME/.local/stats/bin"
+# path to performance and stats version of ltsMin
+LTSMIN_PERF_DIR="$BIN/ltsminPerf/bin"
+LTSMIN_STAT_DIR="$BIN/ltsminStat/bin"
 
 # paths for LD_LIBRARY_PATH
 # mCRL2 201409.1
-MCRL2_2014091="$HOME/.local/lib/mcrl2"
+MCRL2_2014091="$HOME/.local/lib/mcrl2" # TODO Is this needed?
 
 # memtime
 MEMTIME="$BIN/memtime"
 
+# working directory
+WDIR="$HOME/experiments"
+
 # paths to experiments
-EXP="$HOME/experiments/in"
+EXP="$WDIR/in"
 
 # echo to std err
 echoerr() { echo "$@" 1>&2; }
 
 # path to experiment results
 # successful results
-RES="$HOME/experiments/out/0"
+RES="$WDIR/out/0"
 # failed results
-FAILED="$HOME/experiments/out/1"
+FAILED="$WDIR/out/1"
 
-# working directory
-WD="$HOME/experiments/scripts"
+# directory were the generated files are stored
+G_DIR="$WDIR/generated"
 
 # directory with shell scripts for jobs
-BATCH_DIR=$WD/jobs
+BATCH_DIR=$G_DIR/jobs
 # directory with shell scripts for job steps
-STEP_DIR=$WD/steps
+STEP_DIR=$G_DIR/steps
 # executable to submit jobs
-RUN_JOBS=$WD/submit-jobs
+RUN_JOBS=$WDIR/submit_jobs.sh
 # a file which contains all job steps to execute,
 # so that we can randomize the order of execution
-SHUFFLE=$WD/shuffle.txt
+SHUFFLE=$G_DIR/shuffle.txt
 # a file to with std out and std err will be written to
-OUT=$WD/slurm-out.log
+OUT=$G_DIR/slurm_out.log
 
 ## generate job step
 ## 1: command to execute
@@ -325,10 +368,9 @@ FEXP="$EXP/$2"
 
 PARTITION="$3"
 
-BINARY="$BIN/$4"
-BINARY_STATS="$STATS/$4"
+BINARY="$LTSMIN_PERF_DIR/$4"
+BINARY_STATS="$LTSMIN_STAT_DIR/$4"
 NODES="$5"
-#PERNODE="$6"
 
 # delete old job scripts
 rm -r "$BATCH_DIR"
@@ -358,11 +400,10 @@ if [[ -n "$6" && $6=="$OPT_GEN_STEPS" ]]; then
         exit 1 
     fi
 
-    echo "Repeat is $1"
-    echo "Experiments directory is $FEXP"
-    echo "Partition is $PARTITION"
-#    echo "Nodes is $NODES"
-#    echo "Tasks per node is $PERNODE"
+    echo "Number of instances per testcase is $1"
+    echo "Input model directory is $FEXP"
+    echo "Partition for the experiments is $PARTITION"
+    echo "Nodes used for each job is $NODES"
     echo "Binaries are $BINARY and $BINARY_STATS"
     echo "Generating steps, please wait..."
 
@@ -441,7 +482,7 @@ for i in `seq 0 $(($job_count-1))`; do
         echo 'myjobs=1000' >> $RUN_JOBS
         echo 'otherjobs=10000' >> $RUN_JOBS
 	    echo 'while [ $myjobs -gt 608 -o $otherjobs -gt 5000 ]; do' >> $RUN_JOBS
-        echo '    myjobs=$(squeue -h -p'"$PARTITION"' -umeijerjjg | wc -l)' >> $RUN_JOBS
+        echo '    myjobs=$(squeue -h -p'"$PARTITION"' -u'"$USER"'| wc -l)' >> $RUN_JOBS
         echo '    otherjobs=$(squeue -h | wc -l)' >> $RUN_JOBS
 		echo '    sleep 10' >> $RUN_JOBS
 	    echo 'done' >> $RUN_JOBS
