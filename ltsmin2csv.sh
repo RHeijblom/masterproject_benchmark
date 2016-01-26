@@ -1,9 +1,12 @@
 #!/bin/bash
+# Name of the binary of LTSmin used for simulation. This var determines the identification of result produced by ltsminStat
+LTSMIN_BIN="pmnl2lts-sym"
+
 num_files=0
 REDO=""
 
 if [ "$#" -ne 1 ]; then
-  >&2 echo "Usage: $0 <dir> <out.csv>"
+  >&2 echo "Usage: $0 <outputdirectory> > <result.csv>"
   exit 1
 fi
 
@@ -11,7 +14,7 @@ echo '"type","status","order","saturation","filename","regroup","regroup_time","
 
 for i in $(find $1 -type f); do
 	
-	echo $i | grep "0__pins2lts-sym" > /dev/null
+	echo $i | grep "0__$LTSMIN_BIN" > /dev/null
 	if [ $? -eq 0 ]; then
 		echo -n "\"statistics\","
 	else
@@ -122,7 +125,7 @@ for i in $(find $1 -type f); do
 		echo -n "\"none\",\"0\","
 	fi
 	
-	echo $i | grep "0__pins2lts-sym" > /dev/null
+	echo $i | grep "0__$LTSMIN_BIN" > /dev/null
 	is_stat=$?
 	has_printed=$(grep "Weighted Event Span" $i | wc -l)	
 	
