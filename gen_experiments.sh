@@ -85,9 +85,15 @@
 #           |-- gen_experiments.sh                  // this file
 #           +-- submit_jobs.sh                      // script to submit all jobs
 
-POPTS_VERBOSE=$'--peak-nodes --graph-metrics'
+POPTS_VERBOSE=$'--order=chain --peak-nodes --graph-metrics\n'
+POPTS_VERBOSE+=$'--order=chain-prev --peak-nodes --graph-metrics\n'
+POPTS_VERBOSE+=$'--order=bfs --peak-nodes --graph-metrics\n'
+POPTS_VERBOSE+=$'--order=bfs-prev --peak-nodes --graph-metrics'
 
-POPTS=$''
+POPTS=$'--order=chain\n'
+POPTS+=$'--order=chain-prev\n'
+POPTS+=$'--order=bfs\n'
+POPTS+=$'--order=bfs-prev'
 
 # absolute path to scontrol
 sc=`which scontrol`
@@ -96,7 +102,7 @@ sc=`which scontrol`
 # else use some arbitrary ones.
 if [[ $! -ne 0 ]]; then
     STEPS_PER_JOB=600
-    MAX_JOBS=1000
+    MAX_JOBS=16000
 else
     STEPS_PER_JOB=`$sc show config | grep MaxStepCount | grep -Eo '[0-9]+'`
     MAX_JOBS=`$sc show config | grep MaxJobCount | grep -Eo '[0-9]+'`
@@ -111,9 +117,10 @@ echo "Maximum number of jobs is '$MAX_JOBS'"
 OPT_GEN_STEPS="--gen-steps"
 
 # memtime options
-# max time
+# max time = 60*30 seconds
 CMAX=1800
-MMAX=4000000000
+# max virtual mem = 8000000 kB ~ 8000 MB ~ 8GB (approx 3.5 GB will be claimed by node and cache table)
+MMAX=8000000
 
 # slum max time (sometimes slurm does not detect that a job is done)
 SLURM_CMAX=35
@@ -192,7 +199,7 @@ gen_job_step() {
     chmod u+x $script
 
     # add the job step the 'shuffle' file.
-    echo "srun -N1 -n1 --time=$SLURM_CMAX:00 --partition=$PARTITION $script &" >> $SHUFFLE
+    echo "srun -N1 -n1 --ntasks-per-node=8 --time=$SLURM_CMAX:00 --partition=$PARTITION $script &" >> $SHUFFLE
 
 }
 
@@ -226,7 +233,7 @@ gen_job_steps() {
             fi
 
             # the command the job step will execute
-            c="$MEMTIME -m$MMAX -c$CMAX $3 --when --vset=lddmc --lace-workers=1 --lddmc-cachesize=26 --lddmc-tablesize=26 --lddmc-maxtablesize=26 --lddmc-maxcachesize=26 $o $m"
+            c="$MEMTIME -m$MMAX -c$CMAX $3 --when --vset=lddmc --lace-workers=1 --lddmc-cachesize=26 --lddmc-tablesize=26 --lddmc-maxtablesize=26 --lddmc-maxcachesize=26 --saturation=sat-like --save-sat-levels --next-union -rtg,bs,hf $o $m"
 
             # the basename of the command to execute
             n=$(basename "$3")
