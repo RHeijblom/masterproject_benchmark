@@ -85,11 +85,29 @@
 #           |-- gen_experiments.sh                  // this file
 #           +-- submit_jobs.sh                      // script to submit all jobs
 
+# memtime options
+# max time = 60*30 seconds
+MT_MAXCPU=1800
+# max virtual mem = 8000000 kB ~ 8000 MB ~ 8GB (approx 3.5 GB will be claimed by node and cache table)
+MT_MAXMEM=8000000
+
+# Parameters of ltsmin applied on all testcases
+# Resource bounds imposed by SLURM
+PARAM_SLURM='-N1 -n1 -c2 --time=35:00'
+# General parameters of ltsmin
+PARAM_GENERAL='--when'
+# BDD pack used
+PARAM_BDDPACK='--vset=lddmc --lace-workers=1 --lddmc-cachesize=26 --lddmc-tablesize=26 --lddmc-maxtablesize=26 --lddmc-maxcachesize=26'
+# Fixed variables during testing
+PARAM_TEST='--saturation=sat-like --sat-granularity=5 --save-sat-levels --next-union -rtg,bs,hf'
+
+# Additional options for ltsminStat; defines the testcases
 POPTS_VERBOSE=$'--order=chain --peak-nodes --graph-metrics\n'
 POPTS_VERBOSE+=$'--order=chain-prev --peak-nodes --graph-metrics\n'
 POPTS_VERBOSE+=$'--order=bfs --peak-nodes --graph-metrics\n'
 POPTS_VERBOSE+=$'--order=bfs-prev --peak-nodes --graph-metrics'
 
+# Additional options for ltsminPerf; defines the testcases
 POPTS=$'--order=chain\n'
 POPTS+=$'--order=chain-prev\n'
 POPTS+=$'--order=bfs\n'
@@ -100,30 +118,22 @@ sc=`which scontrol`
 
 # if we are on a system with scontrol use the SLURM config,
 # else use some arbitrary ones.
-if [[ $! -ne 0 ]]; then
-    STEPS_PER_JOB=600
-    MAX_JOBS=16000
-else
-    STEPS_PER_JOB=`$sc show config | grep MaxStepCount | grep -Eo '[0-9]+'`
-    MAX_JOBS=`$sc show config | grep MaxJobCount | grep -Eo '[0-9]+'`
-fi
+#if [[ $! -ne 0 ]]; then
+#    STEPS_PER_JOB=600
+#    MAX_JOBS=16000
+#else
+#    STEPS_PER_JOB=`$sc show config | grep MaxStepCount | grep -Eo '[0-9]+'`
+#    MAX_JOBS=`$sc show config | grep MaxJobCount | grep -Eo '[0-9]+'`
+#fi
 
-STEPS_PER_JOB=608
+STEPS_PER_JOB=342
+MAX_JOBS=1000
 
 echo "Maximum number of steps per job is '$STEPS_PER_JOB'"
 echo "Maximum number of jobs is '$MAX_JOBS'"
 
 # a commandline option to generate job steps
 OPT_GEN_STEPS="--gen-steps"
-
-# memtime options
-# max time = 60*30 seconds
-CMAX=1800
-# max virtual mem = 8000000 kB ~ 8000 MB ~ 8GB (approx 3.5 GB will be claimed by node and cache table)
-MMAX=8000000
-
-# slum max time (sometimes slurm does not detect that a job is done)
-SLURM_CMAX=35
 
 # get the absolute path to the home directory
 HOME=$(eval echo ~)
@@ -199,7 +209,7 @@ gen_job_step() {
     chmod u+x $script
 
     # add the job step the 'shuffle' file.
-    echo "srun -N1 -n1 --ntasks-per-node=8 --time=$SLURM_CMAX:00 --partition=$PARTITION $script &" >> $SHUFFLE
+    echo "srun $PARAM_SLURM --partition=$PARTITION $script &" >> $SHUFFLE
 
 }
 
@@ -225,15 +235,11 @@ gen_job_steps() {
             envir="$STEP_DIR/env_$uuid"
             echo "  export LD_LIBRARY_PATH=$4" > $envir
 
-            # fix the options for the experiment
-            if [[ $3 == *lps2lts* ]]; then
-                o="$p --mcrl2='--rewriter=jitty'"
-            else
-                o="$p"
-            fi
+            # ???
+            o="$p"
 
             # the command the job step will execute
-            c="$MEMTIME -m$MMAX -c$CMAX $3 --when --vset=lddmc --lace-workers=1 --lddmc-cachesize=26 --lddmc-tablesize=26 --lddmc-maxtablesize=26 --lddmc-maxcachesize=26 --saturation=sat-like --save-sat-levels --next-union -rtg,bs,hf $o $m"
+            c="$MEMTIME -m$MT_MAXMEM -c$MT_MAXCPU $3 $PARAM_GENERAL $PARAM_BDDPACK $PARAM_TEST $o $m"
 
             # the basename of the command to execute
             n=$(basename "$3")
