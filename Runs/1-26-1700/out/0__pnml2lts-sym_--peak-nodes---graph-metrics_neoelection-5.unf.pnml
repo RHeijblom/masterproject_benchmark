@@ -1,0 +1,57 @@
+Initializing Lace, 2 nodes, 16 cores, 16 logical processors, 1 workers.
+Lace startup, creating 1 worker threads with program stack 8388608 bytes.
+pnml2lts-sym, 0.000: Exploration order is bfs-prev
+pnml2lts-sym, 0.000: Saturation strategy is none
+pnml2lts-sym, 0.000: Guided search strategy is unguided
+pnml2lts-sym, 0.000: Attractor strategy is default
+pnml2lts-sym, 0.000: opening /home/s1083392/experiments/in/ptAll/neoelection-5.unf.pnml
+pnml2lts-sym, 2.458: Petri net has 3090 places, 4674 transitions and 27162 arcs
+pnml2lts-sym, 2.458: There are 0 safe places
+pnml2lts-sym, 7.076: Petri net /home/s1083392/experiments/in/ptAll/neoelection-5.unf.pnml analyzed
+pnml2lts-sym, 7.897: Loading Petri net took 7.900 real 0.440 user 0.040 sys
+pnml2lts-sym, 7.897: state vector length is 3090; there are 4674 groups and 3090 guards
+pnml2lts-sym, 7.897: Creating a multi-core ListDD domain.
+pnml2lts-sym, 178.791: Using GBgetTransitionsShort as next-state function
+pnml2lts-sym, 178.848: got initial state
+pnml2lts-sym, 178.851: level 0 is finished
+pnml2lts-sym, 289.620: vrel_add_act not supported; falling back to vrel_add_cpy
+pnml2lts-sym, 290.956: level 1 is finished
+pnml2lts-sym, 677.624: level 2 is finished
+pnml2lts-sym, 849.080: level 3 is finished
+pnml2lts-sym, 993.925: level 4 is finished
+pnml2lts-sym, 1066.522: level 5 is finished
+pnml2lts-sym, 1082.740: Exploration took 28044 group checks and 28044 next state calls
+pnml2lts-sym, 1082.740: reachability took 903.890 real 29.320 user 27.490 sys
+pnml2lts-sym, 1082.740: counting visited states...
+pnml2lts-sym, 1082.741: counting took 0.000 real 0.000 user 0.000 sys
+pnml2lts-sym, 1082.741: state space has 32 states, 97207 nodes
+pnml2lts-sym, 1082.741: ( 97207 final BDD nodes; 97207 peak nodes; 30483 peak nodes per level )
+pnml2lts-sym, 1082.741: group_next: 20 nodes total
+pnml2lts-sym, 1082.741: group_explored: 25479 nodes, 4709 short vectors total
+[01;31m****************
+* [0m[1mSYLVAN STATS[0m[01;31m *
+****************
+
+[0m[4mBDD operations count (cache reuse, cache put)
+[0m[01;34m
+[0m[4mLDD operations count (cache reuse)
+[0m[01;34mUnion: 813 (33)
+Minus: 238 (0)
+RelProd: 244091 (49)
+SatCount: 102495 (4769)
+SatCountL: 8 (4)
+ProjectMinus: 80750322 (147452)
+LDD Nodes created: 4929965
+LDD Nodes reused: 37467008
+
+[0m[4mGarbage collection
+[0m[01;34mNumber of GC executions: 0
+Total time spent: 0.000000 sec.
+
+BDD Unique table: 4929965 of 67108864 buckets filled.
+Operation cache: 42593682 of 67108864 buckets filled.
+[01;31m****************[0m 
+pnml2lts-sym, 1090.041: max token count: 1
+
+Exit [0]
+40.78 user, 28.05 system, 1090.49 elapsed -- Max VSize = 6615464KB, Max RSS = 3023996KB

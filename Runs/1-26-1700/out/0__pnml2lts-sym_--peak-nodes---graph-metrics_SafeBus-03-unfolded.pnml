@@ -1,0 +1,55 @@
+Initializing Lace, 2 nodes, 16 cores, 16 logical processors, 1 workers.
+Lace startup, creating 1 worker threads with program stack 8388608 bytes.
+pnml2lts-sym, 0.000: Exploration order is bfs-prev
+pnml2lts-sym, 0.000: Saturation strategy is none
+pnml2lts-sym, 0.000: Guided search strategy is unguided
+pnml2lts-sym, 0.000: Attractor strategy is default
+pnml2lts-sym, 0.000: opening /home/s1083392/experiments/in/ptAll/SafeBus-03-unfolded.pnml
+pnml2lts-sym, 0.348: Petri net has 57 places, 91 transitions and 541 arcs
+pnml2lts-sym, 0.348: There are 0 safe places
+pnml2lts-sym, 0.349: Petri net /home/s1083392/experiments/in/ptAll/SafeBus-03-unfolded.pnml analyzed
+pnml2lts-sym, 0.350: Loading Petri net took 0.350 real 0.000 user 0.000 sys
+pnml2lts-sym, 0.350: state vector length is 57; there are 91 groups and 57 guards
+pnml2lts-sym, 0.350: Creating a multi-core ListDD domain.
+pnml2lts-sym, 7.108: Using GBgetTransitionsShort as next-state function
+pnml2lts-sym, 7.108: got initial state
+pnml2lts-sym, 7.108: level 0 is finished
+pnml2lts-sym, 27.950: vrel_add_act not supported; falling back to vrel_add_cpy
+pnml2lts-sym, 33.318: level 1 is finished
+pnml2lts-sym, 33.797: level 2 is finished
+pnml2lts-sym, 34.388: level 3 is finished
+pnml2lts-sym, 34.713: Exploration took 364 group checks and 364 next state calls
+pnml2lts-sym, 34.713: reachability took 27.600 real 0.000 user 1.720 sys
+pnml2lts-sym, 34.713: counting visited states...
+pnml2lts-sym, 34.713: counting took 0.000 real 0.000 user 0.000 sys
+pnml2lts-sym, 34.713: state space has 16 states, 276 nodes
+pnml2lts-sym, 34.713: ( 276 final BDD nodes; 276 peak nodes; 126 peak nodes per level )
+pnml2lts-sym, 34.714: group_next: 90 nodes total
+pnml2lts-sym, 34.714: group_explored: 652 nodes, 265 short vectors total
+[01;31m****************
+* [0m[1mSYLVAN STATS[0m[01;31m *
+****************
+
+[0m[4mBDD operations count (cache reuse, cache put)
+[0m[01;34m
+[0m[4mLDD operations count (cache reuse)
+[0m[01;34mUnion: 554 (198)
+Minus: 105 (3)
+RelProd: 2304 (62)
+SatCount: 677 (150)
+SatCountL: 27 (7)
+ProjectMinus: 21956 (1091)
+LDD Nodes created: 5464
+LDD Nodes reused: 8206
+
+[0m[4mGarbage collection
+[0m[01;34mNumber of GC executions: 0
+Total time spent: 0.000000 sec.
+
+BDD Unique table: 5464 of 67108864 buckets filled.
+Operation cache: 23925 of 67108864 buckets filled.
+[01;31m****************[0m 
+pnml2lts-sym, 37.030: max token count: 1
+
+Exit [0]
+0.16 user, 2.20 system, 37.46 elapsed -- Max VSize = 6615280KB, Max RSS = 198168KB
