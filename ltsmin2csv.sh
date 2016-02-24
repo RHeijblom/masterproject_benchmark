@@ -9,7 +9,7 @@ CHECK_NATURE_FLAG=true
 # Header
 FIXED_HEADER='"sat-granularity","save-sat-levels","next-union",'
 # Values
-FIXED_VALUES='"20","true","true",'
+FIXED_VALUES='"40","true","true",'
 # Regroup is fixed during experiment and MAY not be extracted from filename
 has_regroup=true
 
@@ -83,7 +83,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 	
 		# TYPE (STATISTICS OR PERFORMANCE)
 		type="?"
-		echo $file | grep "0__$LTSMIN_BIN" > /dev/null
+		basename $file | grep "^0__$LTSMIN_BIN" > /dev/null
 		if [ $? -eq 0 ]; then
 			type="\"statistics\","
 			has_sylvanstat=true
@@ -111,9 +111,16 @@ for file in $(find "$INPUT_DIR" -type f); do
 			grep "Killed \[24\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
 				status="\"ootime\","
-				status_spec="\"killed\","
-				info_reachability=3
+				grep "Regrouping took" "$file" > /dev/null
+				if [ $? -eq 0 ]; then
+					status_spec="\"explore\","
+					info_reachability=3
+				else
+					status_spec="\"regroup\","
+					info_reachability=2
+				fi
 				has_found_status=true
+				
 			fi
 		fi
 		# Uncommon cases

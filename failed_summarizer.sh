@@ -43,6 +43,7 @@ if [[ -n $INPUT_FILE  && -f $INPUT_FILE ]]; then
 	# Echo summary
 	echo "Total number of models: $total"
 	echo "Total number of unique models: $totalUnique"
+	rm $TMP_FILE
 else
 	# Error; no suitable input file is given
 	echo "No input file given to be analyzed"

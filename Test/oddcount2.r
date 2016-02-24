@@ -1,0 +1,1 @@
+oddcount <- function(x) sum( x %% 2 == 1 )
