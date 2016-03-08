@@ -52,10 +52,10 @@ function padvalue() {
 >"$OUTPUT_FILE" echo -n '"type","status","status-spec","order","saturation",'
 >>"$OUTPUT_FILE" echo -n "$FIXED_HEADER"
 >>"$OUTPUT_FILE" echo -n '"filename","PT-places","PT-transitions","PT-arcs","PT-safeplaces","regroup-strategy","regroup-time",'
->>"$OUTPUT_FILE" echo -n '"state_vector_length","groups","group-checks","next-state-calls","reachability-time",'
+>>"$OUTPUT_FILE" echo -n '"state-vector-length","groups","group-checks","next-state-calls","reachability-time",'
 >>"$OUTPUT_FILE" echo -n '"statespace-states","statespace-nodes","group-next","group-explored-nodes","group-explored-vectors",'
 >>"$OUTPUT_FILE" echo -n '"time","memory",'
->>"$OUTPUT_FILE" echo '"peak-nodes","BDD-relProd","BDD-satCount","BDD-satCountL","BDD-relProdUnion","BDD-projectMinus"'
+>>"$OUTPUT_FILE" echo '"peak-nodes","BDD-relProd","BDD-satCount","BDD-satCountL","BDD-relProdUnion","BDD-projectMinus",'
 
 # Analyse all files
 for file in $(find "$INPUT_DIR" -type f); do
