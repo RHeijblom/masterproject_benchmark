@@ -1,0 +1,48 @@
+Initializing Lace, 1 workers.
+Lace startup, creating 1 worker threads with program stack 8388608 bytes.
+pnml2lts-sym, 0.000: Exploration order is chain
+pnml2lts-sym, 0.000: Saturation strategy is sat-like
+pnml2lts-sym, 0.000: Guided search strategy is unguided
+pnml2lts-sym, 0.000: Attractor strategy is default
+pnml2lts-sym, 0.000: opening /home/s1083392/experiments/in/ptAll/rwmutex-r10w2000.pnml
+pnml2lts-sym, 0.210: Petri net has 4030 places, 4020 transitions and 48060 arcs
+pnml2lts-sym, 0.210: There are 0 safe places
+pnml2lts-sym, 0.585: Petri net /home/s1083392/experiments/in/ptAll/rwmutex-r10w2000.pnml analyzed
+pnml2lts-sym, 0.685: Loading Petri net took 0.680 real 0.620 user 0.050 sys
+pnml2lts-sym, 0.685: Initializing regrouping layer
+pnml2lts-sym, 0.692: Regroup specification: tg,bs,hf
+pnml2lts-sym, 0.692: Regroup Total graph
+pnml2lts-sym, 0.692: Regroup Boost's Sloan
+pnml2lts-sym, 116.557: bandwidth: 56083
+pnml2lts-sym, 116.584: profile: 1295495528
+pnml2lts-sym, 116.744: span: 1316329783
+pnml2lts-sym, 569.399: average wavefront: 807.52
+pnml2lts-sym, 1001.727: RMS wavefront: 857.81
+pnml2lts-sym, 1001.966: Reqroup Horizontal Flip
+pnml2lts-sym, 1001.970: Regrouping: 4020->4020 groups
+pnml2lts-sym, 1002.598: Regrouping took 1001.920 real 999.480 user 0.230 sys
+pnml2lts-sym, 1002.598: state vector length is 4030; there are 4020 groups and 4030 guards
+pnml2lts-sym, 1002.598: Creating a multi-core ListDD domain.
+pnml2lts-sym, 1011.768: Using GBgetTransitionsShort as next-state function
+pnml2lts-sym, 1011.769: got initial state
+pnml2lts-sym, 1014.916: vrel_add_act not supported; falling back to vrel_add_cpy
+*** segmentation fault ***
+
+Please send information on how to reproduce this problem to: 
+         ltsmin-support@lists.utwente.nl
+along with all output preceding this message.
+In addition, include the following information:
+Package: ltsmin 2.1
+Stack trace:
+  0: /home/s1083392/bin/ltsminStat/bin/pnml2lts-sym() [0x426f0a]
+  1: /home/s1083392/bin/ltsminStat/bin/pnml2lts-sym() [0x426f86]
+  2: /lib/x86_64-linux-gnu/libpthread.so.0(+0x10340) [0x7f6c5c238340]
+  3: /home/s1083392/bin/ltsminStat/bin/pnml2lts-sym() [0x409491]
+  4: /home/s1083392/bin/ltsminStat/bin/pnml2lts-sym() [0x4085e4]
+  5: /home/s1083392/bin/ltsminStat/bin/pnml2lts-sym() [0x416ec6]
+  6: /home/s1083392/bin/ltsminStat/bin/pnml2lts-sym() [0x417bc0]
+  7: /home/s1083392/bin/ltsminStat/bin/pnml2lts-sym() [0x4ad207]
+  8: /lib/x86_64-linux-gnu/libpthread.so.0(+0x8182) [0x7f6c5c230182]
+  9: /lib/x86_64-linux-gnu/libc.so.6(clone+0x6d) [0x7f6c5b73247d]
+Exit [255]
+1011.62 user, 1.09 system, 1015.00 elapsed -- Max VSize = 6664036KB, Max RSS = 3040808KB

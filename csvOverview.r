@@ -61,7 +61,7 @@ print("Done generating solved overview.")
 
 # Maximum percentage which values have to differ from absolute best to still be counted as best
 # eg: 102 is as good as 100 but 106 isn't (relativeMargin = 5)
-relativeMargin <- 0
+relativeMargin <- 5
 
 metricId <- c("time","memory")
 metricName <- c("Time","Memory")
