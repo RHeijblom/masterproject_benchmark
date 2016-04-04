@@ -9,7 +9,7 @@ CHECK_NATURE_FLAG=true
 # Header
 FIXED_HEADER='"sat-granularity","save-sat-levels","next-union",'
 # Values
-FIXED_VALUES='"40","true","true",'
+FIXED_VALUES='"2147483647","true","true",'
 # Regroup is fixed during experiment and MAY not be extracted from filename
 has_regroup=true
 
@@ -212,6 +212,16 @@ for file in $(find "$INPUT_DIR" -type f); do
 						has_found_status=true
 					fi
 				fi
+				info_reachability=3
+			fi
+		fi
+		# Check Killed[9]
+		if ! $has_found_status; then
+			grep "Killed \[9\]" "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				status="\"ootime\","
+				status_spec="\"killed9\","
+				has_found_status=true
 				info_reachability=3
 			fi
 		fi

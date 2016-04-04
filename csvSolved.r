@@ -106,7 +106,7 @@ data$solved <- data$status == "done"
 # Flatten models
 data <- ddply(.parallel=TRUE, data, c("filename","order","sat.granularity"), summarize, totalSolved = sum(solved))
 # Abstract whether a model can be solved
-acceptRate <- 10 # Minimum number of models which have to be solved (currently 5/10)
+acceptRate <- 5 # Minimum number of models which have to be solved (currently 5/10)
 data$solved <- data$totalSolved >= acceptRate
 data <- subset(data, select=c("filename","order","sat.granularity","solved"))
 # data: filename X order X sat.granularity -> Boolean (solved)
