@@ -16,23 +16,35 @@ inputData <- read.csv(file=args[1], sep=',', quote="\"")
 # Global vars
 technique <- c("order","sat.granularity")
 MAXINT <- 2147483647 # Identifier of max granularity
-solvedThreshold <- 5  # At least x out of 10 models need to be solved in order for a technique to be considered as suitable
+solvedThreshold <- 5 # At least x out of 10 models need to be solved in order for a technique to be considered as suitable
 relativeMargin <- 5  # Percentage from which the average metric value should lie to the absolute best metric value to be considered as best metric value
 signSolvable <- "Y"
 signUnsolvable <- "N"
 
+# PREPROCESSING: remove failed models and fix sat.granularity
+dataPerformance <- subset(inputData, type == "performance")
+# Derive state_vector_length for models with at least one solved instance
+mapSvl <- subset(dataPerformance, status="done")
+mapSvl <- subset(mapSvl, select=c("filename","state.vector.length"))
+mapSvl <- ddply(.parallel=TRUE, mapSvl, "filename", summarize, derivedSvl = min(state.vector.length, na.rm=TRUE)) # Note: min can be substituted for any other simple function
+# Add derive state.vector.length to data; also removes completely unsolvable models
+dataPerformance <- merge(dataPerformance, mapSvl, "filename")
+# Fix cases where sat.granularity is too high; may change testcases for a specific granularity to a multiple of 10 
+dataPerformance$sat.granularity <- ifelse(dataPerformance$sat.granularity >= dataPerformance$derivedSvl, MAXINT, dataPerformance$sat.granularity)
+
+# PREPROCESSING: only selected models which are solved above the specified threshold
+dataPerformance$isSolved <- dataPerformance$status == "done"
+# Check which techniques are suitable candidates; i.e. they can solve the model (most of the time)
+dataSolved <- ddply(.parallel=TRUE, dataPerformance, c("filename",technique), summarize, frequency=sum(isSolved), total=length(isSolved))
+dataSolved$isSuitable <- dataSolved$frequency >= ((solvedThreshold*dataSolved$total)/10)
+dataPerformance <- merge(dataPerformance, dataSolved, c("filename",technique))
+# Filter rows
+dataPerformance <- subset(dataPerformance, isSuitable & isSolved)
+
 # Metrics per model
 metrics <- data.frame(id=c("time","memory"), header=c("TIME","MEMORY"))
-
-# Preprocessing: remove redundant colums and rows
-dataPerformance <- subset(inputData, type == "performance")
-# Fix cases where sat.granularity is too high; may change testcases for a specific granularity to a multiple of 10 
-dataPerformance$sat.granularity <- ifelse(dataPerformance$sat.granularity >= dataPerformance$state.vector.length, MAXINT, dataPerformance$sat.granularity)
 # Select relevant columns
-dataPerformance <- subset(dataPerformance, select=c("filename","status", technique, as.character(metrics$id)))
-# Abstract status to boolean (isSolved)
-dataPerformance$isSolved <- dataPerformance$status == "done"
-dataPerformance <- subset(dataPerformance, select=c("filename","isSolved", technique, as.character(metrics$id)))
+dataPerformance <- subset(dataPerformance, select=c("filename", technique, as.character(metrics$id)))
 
 for(mid in 1:nrow(metrics)){
 	# Set metric
@@ -42,16 +54,10 @@ for(mid in 1:nrow(metrics)){
 	dataMetric <- dataPerformance
 	# Rename metric to "metric" so ddply will identify the right column
 	names(dataMetric)[names(dataMetric)==metric] <- "metric"
-	# Check which techniques are suitable candidates; i.e. they can solve the model (most of the time)
-	dataMetricSolved <- ddply(.parallel=TRUE, dataMetric, c("filename",technique), summarize, frequency=sum(isSolved), total=length(isSolved))
-	dataMetricSolved$isSuitable <- dataMetricSolved$frequency >= ((solvedThreshold*dataMetricSolved$total)/10)
-	dataMetric <- merge(dataMetric, dataMetricSolved, c("filename",technique))
-	# Select suitable candidates
-	dataMetric <- subset(dataMetric, isSuitable & isSolved)
 	# Flatten testcases per model and technique
 	dataMetric <- ddply(.parallel=TRUE, dataMetric, c("filename", technique), summarize, avgMetric = mean(metric))
 	
-	# Find best candidates
+	# Find best values for the given metric per model
 	dataBestMetric <- ddply(.parallel=TRUE, dataMetric, "filename", summarize, bestMetric = min(avgMetric))
 	dataBest <- merge(dataMetric, dataBestMetric, "filename")
 	dataBest <- subset(dataBest, avgMetric <= ((bestMetric*(100+relativeMargin))/100))
@@ -79,7 +85,7 @@ for(mid in 1:nrow(metrics)){
 	print("")
 	
 	dataSummary <- ddply(.parallel=TRUE, dataBest, technique, summarize, frequency=length(filename))
-	dataSummary  <- dataSummary [order(dataSummary$order, dataSummary$sat.granularity),]
+	dataSummary <- dataSummary [order(dataSummary$order, dataSummary$sat.granularity),]
 	print("Overview times best per technique:")
 	print(dataSummary)
 	print("")

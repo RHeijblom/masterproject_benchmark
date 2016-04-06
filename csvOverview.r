@@ -13,16 +13,29 @@ doMC::registerDoMC(cores=8)
 args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
 
+# Global variables
 testCase <- c("order","sat.granularity")
+MAXINT <- 2147483647 # Identifier of max granularity
+
+# PREPROCESSING: remove failed models and fix sat.granularity
+# Derive state_vector_length for models with at least one solved instance
+mapSvl <- ddply(.parallel=TRUE, inputData, "filename", summarize, derivedSvl = mean(state.vector.length, na.rm=TRUE))
+# Add derive state.vector.length to data; also removes completely unsolvable models
+inputData <- merge(inputData, mapSvl, "filename")
+# Fix cases where sat.granularity is too high; may change testcases for a specific granularity to a multiple of 10 
+inputData$sat.granularity <- ifelse(!is.na(inputData$derivedSvl) & inputData$sat.granularity >= inputData$derivedSvl, "max", inputData$sat.granularity)
+
+# Hardcoded error fix of granularities axis
+inputData$sat.granularity <- ifelse(nchar(inputData$sat.granularity) == 1, paste0("0",inputData$sat.granularity), inputData$sat.granularity)
 
 # STATUS
 
 print("Start generating solved overview.")
 
 # Select relevant columns
-inputDataStatus <- subset(inputData, select=c("filename","type", testCase,"status","status.spec"))
+inputDataStatus <- subset(inputData, select=c("filename","type", testCase,"status"))
 # Flatten status
-inputDataStatus <- ddply(.parallel=TRUE, inputDataStatus, c("filename", testCase,"status","status.spec"), summarize, frequency=length(status))
+inputDataStatus <- ddply(.parallel=TRUE, inputDataStatus, c("filename", testCase,"status"), summarize, frequency=length(status))
 # Abstract status to "ok" and "fail"
 inputDataStatusSimple <- inputDataStatus
 inputDataStatusSimple$status <- ifelse(grepl("done",inputDataStatus$status),"ok","fail")
@@ -37,7 +50,7 @@ statusFail = ddply(.parallel=TRUE, statusFail, testCase, summarize, totalFail = 
 # Combine ok frequency and fail frequency in single row
 statusOverview = merge(statusOk, statusFail, testCase)
 
-statusOverview$total = statusOverview[,3] + statusOverview[,4]
+statusOverview$total = statusOverview[,"totalOk"] + statusOverview[,"totalFail"]
 
 print("Overview:")
 print(statusOverview)
@@ -46,7 +59,7 @@ print(statusOverview)
 
 ggplot(statusOverview) + 
 	# Data
-	geom_line(aes(x=sat.granularity, y=totalOk, color=order)) +
+	geom_point(aes(x=sat.granularity, y=totalOk, color=order)) +
 	# Aes
 	labs(title="Performance Overview") +
 	xlab("Saturation granularity") +

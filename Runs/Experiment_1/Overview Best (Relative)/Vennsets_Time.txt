@@ -4,25 +4,26 @@
         order sat.granularity frequency
 1         bfs               1        31
 2         bfs               5         3
-3    bfs-prev               1        33
-4    bfs-prev               5         9
-5    bfs-prev              10         4
-6    bfs-prev              20         2
+3    bfs-prev               1        32
+4    bfs-prev               5         8
+5    bfs-prev              10         3
+6    bfs-prev              20         1
 7    bfs-prev              30         1
 8    bfs-prev              40         1
-9       chain               1        73
-10      chain               5        23
-11      chain              10        15
-12      chain              20        17
-13      chain              30        10
-14      chain              40         4
-15      chain      2147483647         3
-16 chain-prev               1        47
-17 chain-prev               5        10
-18 chain-prev              10         7
-19 chain-prev              20         5
-20 chain-prev              30         2
-21 chain-prev              40         1
+9    bfs-prev      2147483647         2
+10      chain               1        72
+11      chain               5        21
+12      chain              10        15
+13      chain              20        17
+14      chain              30         9
+15      chain              40         4
+16      chain      2147483647         6
+17 chain-prev               1        47
+18 chain-prev               5        10
+19 chain-prev              10         7
+20 chain-prev              20         4
+21 chain-prev              30         2
+22 chain-prev              40         1
 [1] ""
 [1] "Total number of venn sets: 56"
 [1] ""
@@ -111,6 +112,7 @@
 [1] "chain-20"
 [1] "   - 2D8_gradient_40x40_10.pnml"
 [1] "   - cs_repetitions-2-unfolded.pnml"
+[1] "   - distributeur-01-unfolded-02.pnml"
 [1] ""
 [1] "chain-10"
 [1] "chain-20"
@@ -118,10 +120,9 @@
 [1] "   - Philosophers-200.pnml"
 [1] "   - Philosophers-50.pnml"
 [1] ""
+[1] "chain-2147483647"
 [1] "chain-prev-5"
 [1] "   - angiogenesis-01.pnml"
-[1] "   - dekker-10.pnml"
-[1] "   - erk-000100.pnml"
 [1] ""
 [1] "chain-5"
 [1] "chain-prev-5"
@@ -145,7 +146,6 @@
 [1] "chain-10"
 [1] "   - circadian_clock-000001.pnml"
 [1] "   - cs_repetitions-3-unfolded.pnml"
-[1] "   - Philosophers-10.pnml"
 [1] "   - Philosophers-20.pnml"
 [1] ""
 [1] "bfs-prev-1"
@@ -210,6 +210,10 @@
 [1] "bfs-prev-20"
 [1] "   - cs_repetitions-4-unfolded.pnml"
 [1] ""
+[1] "chain-prev-5"
+[1] "   - dekker-10.pnml"
+[1] "   - erk-000100.pnml"
+[1] ""
 [1] "bfs-prev-5"
 [1] "chain-1"
 [1] "chain-5"
@@ -223,11 +227,6 @@
 [1] "chain-prev-30"
 [1] "chain-prev-40"
 [1] "   - dekker-20.pnml"
-[1] ""
-[1] "chain-5"
-[1] "chain-20"
-[1] "chain-2147483647"
-[1] "   - distributeur-01-unfolded-02.pnml"
 [1] ""
 [1] "chain-1"
 [1] "chain-5"
@@ -260,7 +259,6 @@
 [1] "chain-1"
 [1] "chain-20"
 [1] "   - IBM703.pnml"
-[1] "   - parking_1_4.pnml"
 [1] "   - Vasy2003.pnml"
 [1] ""
 [1] "bfs-prev-1"
@@ -294,6 +292,13 @@
 [1] ""
 [1] "chain-2147483647"
 [1] "   - MAPK-80.pnml"
+[1] "   - raft_02.pnml"
+[1] "   - SafeBus-03-unfolded.pnml"
+[1] ""
+[1] "chain-1"
+[1] "chain-20"
+[1] "chain-2147483647"
+[1] "   - parking_1_4.pnml"
 [1] ""
 [1] "chain-prev-1"
 [1] "chain-prev-5"
@@ -303,6 +308,10 @@
 [1] "chain-10"
 [1] "chain-30"
 [1] "   - Philosophers-100.pnml"
+[1] ""
+[1] "chain-10"
+[1] "chain-2147483647"
+[1] "   - Philosophers-10.pnml"
 [1] ""
 [1] "chain-20"
 [1] "   - Philosophers-2000.pnml"
@@ -320,10 +329,6 @@
 [1] "bfs-prev-5"
 [1] "chain-5"
 [1] "   - QCertifProtocol_32-unfold.pnml"
-[1] ""
-[1] "chain-5"
-[1] "chain-2147483647"
-[1] "   - raft_02.pnml"
 [1] ""
 [1] "chain-30"
 [1] "   - raft_03.pnml"
@@ -354,12 +359,6 @@
 [1] "   - rwmutex-r10w50.pnml"
 [1] "   - rwmutex-r2000w10.pnml"
 [1] ""
-[1] "chain-1"
-[1] "chain-5"
-[1] "chain-30"
-[1] "   - SafeBus-03-unfolded.pnml"
-[1] "   - simple_lbs-2.pnml"
-[1] ""
 [1] "bfs-prev-10"
 [1] "chain-prev-1"
 [1] "   - SafeBus-06-unfolded.pnml"
@@ -370,14 +369,17 @@
 [1] "chain-20"
 [1] "   - shared_memory-pt-10.pnml"
 [1] ""
-[1] "bfs-prev-1"
-[1] "bfs-prev-5"
-[1] "bfs-prev-10"
+[1] "chain-1"
+[1] "chain-5"
+[1] "chain-30"
+[1] "   - simple_lbs-2.pnml"
+[1] ""
+[1] "bfs-prev-2147483647"
 [1] "   - soli0_counter_square5.pnml"
+[1] "   - unf-8x8-4stageSEN-01.pnml"
 [1] ""
 [1] "chain-prev-30"
 [1] "   - TokenRing-15-unfolded.pnml"
 [1] ""
-[1] "bfs-prev-20"
-[1] "chain-prev-20"
-[1] "   - unf-8x8-4stageSEN-01.pnml"
+[1] ""
+[1] ""
