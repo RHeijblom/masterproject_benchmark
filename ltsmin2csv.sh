@@ -55,6 +55,7 @@ function padvalue() {
 >>"$OUTPUT_FILE" echo -n '"state-vector-length","groups","group-checks","next-state-calls","reachability-time",'
 >>"$OUTPUT_FILE" echo -n '"statespace-states","statespace-nodes","group-next","group-explored-nodes","group-explored-vectors",'
 >>"$OUTPUT_FILE" echo -n '"time","memory",'
+>>"$OUTPUT_FILE" echo -n '"bandwidth","profile","span","average-wavefront","RMS-wavefront",'
 >>"$OUTPUT_FILE" echo '"peak-nodes","BDD-relProd","BDD-satCount","BDD-satCountL","BDD-relProdUnion","BDD-projectMinus",'
 
 # Analyse all files
@@ -352,6 +353,61 @@ for file in $(find "$INPUT_DIR" -type f); do
 	    	}' "$file" >>"$OUTPUT_FILE"
 		else
 			padvalue "$OUTPUT_FILE" 2
+		fi
+		
+		# REGROUP STATISTICS
+		
+		basename $file | grep "\-\-graph\-metrics" > /dev/null
+		if [ $? -eq 0 ]; then
+			# Regroup stats may be present
+			# BANDWIDTH
+			grep ": bandwidth: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($3 == "bandwidth:") printf "\"%s\",", $4
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# PROFILE
+			grep ": profile: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($3 == "profile:") printf "\"%s\",", $4
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# SPAN
+			grep ": span: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($3 == "span:") printf "\"%s\",", $4
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# AVERAGE WAVEFRONT
+			grep ": average wavefront: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($3" "$4 == "average wavefront:") printf "\"%s\",", $5
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# RMS WAVEFRONT
+			grep ": RMS wavefront: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($3" "$4 == "RMS wavefront:") printf "\"%s\",", $5
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+		else
+			# No regroup statistics
+			padvalue "$OUTPUT_FILE" 5
 		fi
 		
 		# SYLVAN STATISTICS

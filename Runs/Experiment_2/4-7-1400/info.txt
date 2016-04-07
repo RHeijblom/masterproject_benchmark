@@ -1,0 +1,19 @@
+This run aims at collecting the properties of petrinets after the regrouping phase.
+Specifically the following properties are needed:
+
+Regroup
+- bandwidth
+- profile
+- span
+- average wavefront
+- RMS wavefront
+
+Because regrouping is deterministic only 2 runs are performed per testcase. To increase the likelyhood
+of encountering this information at least once per model, different order and sat-granularity from experiment
+1 are uses to define different testcases per model. Since there were 4 different orders and 7 different
+sat-granularities for experiment 1 (before 7th of April) there are 28 testcases per model. This makes 56 runs
+per model.
+
+Since the sylvan stats are not needed, there is no distinction between performance and statistic testcases.
+So the statistics runs are omitted.
+

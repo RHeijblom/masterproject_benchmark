@@ -9,46 +9,7 @@
 # * Generate job shell scripts in parallel
 # the directory layout this script uses is as follows.
 
-# ORIGINAL LAYOUT:
-# +-- ~/
-#      |-- .local/                                  // locally installed software
-#      |    +-- bin/
-#      |         |-- memtime/bin/memtime
-#      |         |-- ltsmin/
-#      |         |    +-- bin/
-#      |         |         |-- lps2lts-sym
-#      |         |         |-- prom2lts-sym
-#      |         |         +-- dve2lts-sym
-#      |         +-- mcrl2/mCRL2-201210/lib/mcrl2/
-#      +-- experiments/
-#           |-- in/                                 // the models to experiment with
-#           |    |-- dve/
-#           |    |    |-- a_dve_model.dve2C
-#           |    |    +-- ...
-#           |    |-- promela/
-#           |    |    |-- a_promela_model.spins
-#           |    |    +-- ...
-#           |    +-- mcrl2/
-#           |         |-- an_mcrl2_model.lps
-#           |         +-- ...
-#           |-- out/                                // root directory of experiment output
-#           |    |-- 0/
-#           |    |    |-- <experiment_output>.dve2C // results of a dve experiment
-#           |    |    +-- ...
-#           |    +-- 1/failed                       // file which contains failed experiments
-#           +-- scripts/
-#                |-- jobs/                          // contains job scripts (sbatch command with srun commands)
-#                |    |-- 0
-#                |    +-- ...
-#                |-- steps/                         // contains job step scripts; shell scripts to do an experiment
-#                |    |-- step_<uuid>.sh
-#                |    +-- ...
-#                |-- gen-experiments                // this file
-#                |-- shuffle.txt                    // file to randomize the order of job steps
-#                |-- slurm-out.log                  // SLURM std err and std out
-#                +-- submit-jobs                    // script to submit all jobs
-
-# MODIFIED LAYOUT
+# LAYOUT:
 # +-- ~/
 #      |-- bin/                                     // locally installed software
 #      |    |-- memtime/bin/memtime
@@ -80,8 +41,7 @@
 #           |    |-- steps/                         // contains job step scripts; shell scripts to do an experiment
 #           |    |    |-- step_<uuid>.sh
 #           |    |    +-- ...
-#           |    |-- shuffle.txt                    // file to randomize the order of job steps
-#           |    +-- slurm-out.log                  // SLURM std err and std out
+#           |    +-- shuffle.txt                    // file to randomize the order of job steps
 #           |-- gen_experiments.sh                  // this file
 #           +-- submit_jobs.sh                      // script to submit all jobs
 
@@ -99,19 +59,50 @@ PARAM_GENERAL='--when'
 # BDD pack used
 PARAM_BDDPACK='--vset=lddmc --lace-workers=1 --lddmc-cachesize=26 --lddmc-tablesize=26 --lddmc-maxtablesize=26 --lddmc-maxcachesize=26'
 # Fixed variables during testing
-PARAM_TEST='--saturation=sat-like --sat-granularity=5 --save-sat-levels --next-union -rtg,bs,hf'
+PARAM_TEST='--saturation=sat-like --save-sat-levels --next-union -rtg,bs,hf' #WARNING --sat-granularity=X is moved to testcases
 
 # Additional options for ltsminStat; defines the testcases
+DO_STAT_CASES=false
+# Default testcase
 POPTS_VERBOSE=$'--order=chain --peak-nodes --graph-metrics\n'
 POPTS_VERBOSE+=$'--order=chain-prev --peak-nodes --graph-metrics\n'
 POPTS_VERBOSE+=$'--order=bfs --peak-nodes --graph-metrics\n'
 POPTS_VERBOSE+=$'--order=bfs-prev --peak-nodes --graph-metrics'
 
 # Additional options for ltsminPerf; defines the testcases
-POPTS=$'--order=chain\n'
-POPTS+=$'--order=chain-prev\n'
-POPTS+=$'--order=bfs\n'
-POPTS+=$'--order=bfs-prev'
+# Default testcase
+#POPTS=$'--order=chain\n'
+#POPTS+=$'--order=chain-prev\n'
+#POPTS+=$'--order=bfs\n'
+#POPTS+=$'--order=bfs-prev'
+POPTS=$'--order=chain --sat-granularity=1 --graph-metrics\n'
+POPTS+=$'--order=chain-prev --sat-granularity=1 --graph-metrics\n'
+POPTS+=$'--order=bfs --sat-granularity=1 --graph-metrics\n'
+POPTS+=$'--order=bfs-prev --sat-granularity=1 --graph-metrics\n'
+POPTS+=$'--order=chain --sat-granularity=5 --graph-metrics\n'
+POPTS+=$'--order=chain-prev --sat-granularity=5 --graph-metrics\n'
+POPTS+=$'--order=bfs --sat-granularity=5 --graph-metrics\n'
+POPTS+=$'--order=bfs-prev --sat-granularity=5 --graph-metrics\n'
+POPTS+=$'--order=chain --sat-granularity=10 --graph-metrics\n'
+POPTS+=$'--order=chain-prev --sat-granularity=10 --graph-metrics\n'
+POPTS+=$'--order=bfs --sat-granularity=10 --graph-metrics\n'
+POPTS+=$'--order=bfs-prev --sat-granularity=10 --graph-metrics\n'
+POPTS+=$'--order=chain --sat-granularity=20 --graph-metrics\n'
+POPTS+=$'--order=chain-prev --sat-granularity=20 --graph-metrics\n'
+POPTS+=$'--order=bfs --sat-granularity=20 --graph-metrics\n'
+POPTS+=$'--order=bfs-prev --sat-granularity=20 --graph-metrics\n'
+POPTS+=$'--order=chain --sat-granularity=30 --graph-metrics\n'
+POPTS+=$'--order=chain-prev --sat-granularity=30 --graph-metrics\n'
+POPTS+=$'--order=bfs --sat-granularity=30 --graph-metrics\n'
+POPTS+=$'--order=bfs-prev --sat-granularity=30 --graph-metrics\n'
+POPTS+=$'--order=chain --sat-granularity=40 --graph-metrics\n'
+POPTS+=$'--order=chain-prev --sat-granularity=40 --graph-metrics\n'
+POPTS+=$'--order=bfs --sat-granularity=40 --graph-metrics\n'
+POPTS+=$'--order=bfs-prev --sat-granularity=40 --graph-metrics\n'
+POPTS+=$'--order=chain --sat-granularity=2147483647 --graph-metrics\n'
+POPTS+=$'--order=chain-prev --sat-granularity=2147483647 --graph-metrics\n'
+POPTS+=$'--order=bfs --sat-granularity=2147483647 --graph-metrics\n'
+POPTS+=$'--order=bfs-prev --sat-granularity=2147483647 --graph-metrics'
 
 # absolute path to scontrol
 sc=`which scontrol`
@@ -329,7 +320,9 @@ if [[ -n "$6" && $6=="$OPT_GEN_STEPS" ]]; then
         gen_job_steps "$PNML" "$POPTS" "$BINARY" '""' "$i" &
 
     done
-    gen_job_steps "$PNML" "$POPTS_VERBOSE" "$BINARY_STATS" '""' "0" &
+	if $DO_STAT_CASES; then
+    	gen_job_steps "$PNML" "$POPTS_VERBOSE" "$BINARY_STATS" '""' "0" &
+	fi
     wait
 
     # shuffle our job step scripts so that they will be executed in random order.
