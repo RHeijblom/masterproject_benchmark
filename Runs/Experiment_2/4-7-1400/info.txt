@@ -17,3 +17,8 @@ per model.
 Since the sylvan stats are not needed, there is no distinction between performance and statistic testcases.
 So the statistics runs are omitted.
 
+Note that ltsmin2csv.sh assumes that the sat-granularity is fixed for a testsuite. Thus the sat-granularities 
+are incorrect in the parsed result. Since the different sat-granularities were only used for generating the 
+different test cases, there is no problem. The results will be compressed to model X order -> stats. If
+the correct sat-granularities are needed, the output of this suite should be 'reparsed' with a revision of
+ltsmin2csv.sh.

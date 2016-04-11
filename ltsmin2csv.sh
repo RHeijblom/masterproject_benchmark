@@ -9,7 +9,7 @@ CHECK_NATURE_FLAG=true
 # Header
 FIXED_HEADER='"sat-granularity","save-sat-levels","next-union",'
 # Values
-FIXED_VALUES='"2147483647","true","true",'
+FIXED_VALUES='"","true","true",'
 # Regroup is fixed during experiment and MAY not be extracted from filename
 has_regroup=true
 
@@ -53,7 +53,7 @@ function padvalue() {
 >>"$OUTPUT_FILE" echo -n "$FIXED_HEADER"
 >>"$OUTPUT_FILE" echo -n '"filename","PT-places","PT-transitions","PT-arcs","PT-safeplaces","regroup-strategy","regroup-time",'
 >>"$OUTPUT_FILE" echo -n '"state-vector-length","groups","group-checks","next-state-calls","reachability-time",'
->>"$OUTPUT_FILE" echo -n '"statespace-states","statespace-nodes","group-next","group-explored-nodes","group-explored-vectors",'
+>>"$OUTPUT_FILE" echo -n '"statespace-states","statespace-nodes","group-next","group-explored-nodes","group-explored-vectors","max-tokens",'
 >>"$OUTPUT_FILE" echo -n '"time","memory",'
 >>"$OUTPUT_FILE" echo -n '"bandwidth","profile","span","average-wavefront","RMS-wavefront",'
 >>"$OUTPUT_FILE" echo '"peak-nodes","BDD-relProd","BDD-satCount","BDD-satCountL","BDD-relProdUnion","BDD-projectMinus",'
@@ -339,9 +339,11 @@ for file in $(find "$INPUT_DIR" -type f); do
 				else if ($3 == "group_next:") printf "\"%s\",", $4
 				# GROUP EXPLORED NODES and VECTORS
 				else if ($3 == "group_explored:") printf "\"%s\",\"%s\",", $4, $6
+				# MAX TOKEN COUNT
+				else if ($3" "$4" "$5 == "max token count:") printf "\"%s\",", $6
 	    	}' "$file" >>"$OUTPUT_FILE"
 		else
-			padvalue "$OUTPUT_FILE" 8
+			padvalue "$OUTPUT_FILE" 9
 		fi
 		
 		# MEMTIME STATISTICS
