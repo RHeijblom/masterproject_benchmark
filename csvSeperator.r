@@ -21,16 +21,11 @@ relativeMargin <- 5  # Percentage from which the average metric value should lie
 signSolvable <- "Y"
 signUnsolvable <- "N"
 
-# PREPROCESSING: remove failed models and fix sat.granularity
+# PREPROCESSING: remove corrupt data and fix sat.granularity
 dataPerformance <- subset(inputData, type == "performance")
-# Derive state_vector_length for models with at least one solved instance
-mapSvl <- subset(dataPerformance, status="done")
-mapSvl <- subset(mapSvl, select=c("filename","state.vector.length"))
-mapSvl <- ddply(.parallel=TRUE, mapSvl, "filename", summarize, derivedSvl = min(state.vector.length, na.rm=TRUE)) # Note: min can be substituted for any other simple function
-# Add derive state.vector.length to data; also removes completely unsolvable models
-dataPerformance <- merge(dataPerformance, mapSvl, "filename")
-# Fix cases where sat.granularity is too high; may change testcases for a specific granularity to a multiple of 10 
-dataPerformance$sat.granularity <- ifelse(dataPerformance$sat.granularity >= dataPerformance$derivedSvl, MAXINT, dataPerformance$sat.granularity)
+source("./dataUtils.r")
+dataPerformance <- removeCorruptEntries(dataPerformance)
+dataPerformance <- fixSatGranularity(dataPerformance)
 
 # PREPROCESSING: only selected models which are solved above the specified threshold
 dataPerformance$isSolved <- dataPerformance$status == "done"

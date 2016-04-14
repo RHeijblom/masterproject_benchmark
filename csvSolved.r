@@ -97,6 +97,9 @@ drawVenn <- function(dfSolvable, file){
 # Read input from csv
 args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
+source("./dataUtils.r")
+inputData <- removeCorruptEntries(inputData)
+inputData <- fixSatGranularity(inputData)
 
 # Remove statistics data and irrelevant columns
 data <- subset(inputData, type=="performance")

@@ -12,20 +12,15 @@ doMC::registerDoMC(cores=8)
 # Read input from csv
 args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
+source("./dataUtils.r")
+inputData <- removeCorruptEntries(inputData)
+inputData <- fixSatGranularity(inputData)
 
 # Global variables
 testCase <- c("order","sat.granularity")
-MAXINT <- 2147483647 # Identifier of max granularity
-
-# PREPROCESSING: remove failed models and fix sat.granularity
-# Derive state_vector_length for models with at least one solved instance
-mapSvl <- ddply(.parallel=TRUE, inputData, "filename", summarize, derivedSvl = mean(state.vector.length, na.rm=TRUE))
-# Add derive state.vector.length to data; also removes completely unsolvable models
-inputData <- merge(inputData, mapSvl, "filename")
-# Fix cases where sat.granularity is too high; may change testcases for a specific granularity to a multiple of 10 
-inputData$sat.granularity <- ifelse(!is.na(inputData$derivedSvl) & inputData$sat.granularity >= inputData$derivedSvl, "max", inputData$sat.granularity)
 
 # Hardcoded error fix of granularities axis
+inputData$sat.granularity <- ifelse(inputData$sat.granularity == MAXINT, "max", inputData$sat.granularity)
 inputData$sat.granularity <- ifelse(nchar(inputData$sat.granularity) == 1, paste0("0",inputData$sat.granularity), inputData$sat.granularity)
 
 # STATUS
@@ -74,7 +69,7 @@ print("Done generating solved overview.")
 
 # Maximum percentage which values have to differ from absolute best to still be counted as best
 # eg: 102 is as good as 100 but 106 isn't (relativeMargin = 5)
-relativeMargin <- 5
+relativeMargin <- 0
 
 metricId <- c("time","memory")
 metricName <- c("Time","Memory")
