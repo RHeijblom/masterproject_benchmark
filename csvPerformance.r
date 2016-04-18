@@ -12,6 +12,8 @@ doMC::registerDoMC(cores=8)
 # Read input from csv
 args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
+source("./dataUtils.r")
+inputData <- preprocessAll(inputData)
 
 testCase <- c("order","sat.granularity")
 
@@ -46,7 +48,7 @@ for(m in 1:length(metricId)){
 		# Make diagram
 		ggplot(modelOverview) + 
 			# Data
-			geom_line(aes(x=sat.granularity, y=mean, color=order)) +
+			geom_point(aes(x=sat.granularity, y=mean, color=order)) +
 			geom_errorbar(aes(x=sat.granularity, ymin=mean-sd, ymax=mean+sd, color=order), width=0.25) +
 			# Aes
 			labs(title=paste0("Performance ", model, " (", name, ")")) +
@@ -76,7 +78,6 @@ for(model in unique(inputDataStats$filename)){
 	# Make diagram
 	ggplot(modelEff) + 
 		# Data
-		geom_line(aes(x=sat.granularity, y=metric, color=order)) +
 		geom_point(aes(x=sat.granularity, y=metric, color=order)) +
 		# Aes
 		labs(title=paste0("Efficiency ", model, " (Peak Nodes)")) +

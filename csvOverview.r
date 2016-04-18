@@ -13,17 +13,14 @@ doMC::registerDoMC(cores=8)
 args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
 source("./dataUtils.r")
-inputData <- removeCorruptEntries(inputData)
-inputData <- fixSatGranularity(inputData)
+inputData <- preprocessAll(inputData)
 
 # Global variables
 testCase <- c("order","sat.granularity")
+solvedThreshold <- 5 # At least x out of 10 models need to be solved in order for a technique to be considered as suitable
+relativeMargin <- 0  # Percentage from which the average metric value should lie to the absolute best metric value to be considered as best metric value
 
-# Hardcoded error fix of granularities axis
-inputData$sat.granularity <- ifelse(inputData$sat.granularity == MAXINT, "max", inputData$sat.granularity)
-inputData$sat.granularity <- ifelse(nchar(inputData$sat.granularity) == 1, paste0("0",inputData$sat.granularity), inputData$sat.granularity)
-
-# STATUS
+# OVERVIEW SOLVED MODELS (TOTAL)
 
 print("Start generating solved overview.")
 
@@ -65,11 +62,19 @@ ggsave("./Out/Solved.pdf", height=4, width=7)
 
 print("Done generating solved overview.")
 
-# BEST CONFIGURATION wrt a specific metric
+# LAZY; RIP FROM CSVSEPERATOR.R	
+# PREPROCESSING: only selected models which are solved above the specified threshold
+dataPerformance <- subset(inputData, type == "performance")
+dataPerformance$isSolved <- dataPerformance$status == "done"
+# Check which techniques are suitable candidates; i.e. they can solve the model (most of the time)
+dataSolved <- ddply(.parallel=TRUE, dataPerformance, c("filename","order","sat.granularity"), summarize, frequency=sum(isSolved), total=length(isSolved))
+dataSolved$isSuitable <- 10*dataSolved$frequency >= solvedThreshold*dataSolved$total
+dataPerformance <- merge(dataPerformance, dataSolved, c("filename","order","sat.granularity"))
+# Filter rows
+dataPerformance <- subset(dataPerformance, isSuitable & isSolved)
 
-# Maximum percentage which values have to differ from absolute best to still be counted as best
-# eg: 102 is as good as 100 but 106 isn't (relativeMargin = 5)
-relativeMargin <- 0
+
+# BEST CONFIGURATION wrt a specific metric
 
 metricId <- c("time","memory")
 metricName <- c("Time","Memory")
@@ -83,7 +88,7 @@ for(m in 1:length(metricId)){
 	
 	print(paste("Start generating", metric, "overview."))
 	
-	dataSolved <- subset(subset(inputData, status == "done" & type == "performance"), select=c("filename", testCase, metric))
+	dataSolved <- subset(subset(dataPerformance, status == "done"), select=c("filename", testCase, metric))
 	# Rename metric to "metric" so ddply will identify the right column
 	names(dataSolved)[names(dataSolved)==metric] <- "metric"
 	# Flatten time

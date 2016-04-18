@@ -12,26 +12,22 @@ doMC::registerDoMC(cores=8)
 # Read input from csv
 args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
+source("./dataUtils.r")
+inputData <- preprocessAll(inputData)
 
 # Global vars
 technique <- c("order","sat.granularity")
-MAXINT <- 2147483647 # Identifier of max granularity
 solvedThreshold <- 5 # At least x out of 10 models need to be solved in order for a technique to be considered as suitable
-relativeMargin <- 5  # Percentage from which the average metric value should lie to the absolute best metric value to be considered as best metric value
+relativeMargin <- 0  # Percentage from which the average metric value should lie to the absolute best metric value to be considered as best metric value
 signSolvable <- "Y"
 signUnsolvable <- "N"
 
-# PREPROCESSING: remove corrupt data and fix sat.granularity
-dataPerformance <- subset(inputData, type == "performance")
-source("./dataUtils.r")
-dataPerformance <- removeCorruptEntries(dataPerformance)
-dataPerformance <- fixSatGranularity(dataPerformance)
-
 # PREPROCESSING: only selected models which are solved above the specified threshold
+dataPerformance <- subset(inputData, type == "performance")
 dataPerformance$isSolved <- dataPerformance$status == "done"
 # Check which techniques are suitable candidates; i.e. they can solve the model (most of the time)
 dataSolved <- ddply(.parallel=TRUE, dataPerformance, c("filename",technique), summarize, frequency=sum(isSolved), total=length(isSolved))
-dataSolved$isSuitable <- dataSolved$frequency >= ((solvedThreshold*dataSolved$total)/10)
+dataSolved$isSuitable <- 10*dataSolved$frequency >= solvedThreshold*dataSolved$total
 dataPerformance <- merge(dataPerformance, dataSolved, c("filename",technique))
 # Filter rows
 dataPerformance <- subset(dataPerformance, isSuitable & isSolved)

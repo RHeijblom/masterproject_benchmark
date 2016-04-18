@@ -3,4 +3,8 @@ This directory contains the performance of the techniques wrt the number of solv
 Without considering the statistics runs there are 10 runs per technique (combination of order and sat-granularity)
 
 A model is solvable by technique X if X has succesfully solved the model at least 5 out of 10 times.
+
 The above is assummed for all files results except 'Solved Overview Total' which individualy counts the testruns.
+The number of testcases per granularity isn't fixed due to the value of state_vector_length. When granularity is
+larger than state_vector_length, the testcase is moved to max. This explains the spike at max. 
+

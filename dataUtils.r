@@ -10,6 +10,15 @@ doMC::registerDoMC(cores=8)
 
 MAXINT <- 2147483647 # Identifier of max granularity
 
+# Applies all dataUtil methods on given dataframe
+preprocessAll <- function(dfCsvEntries){
+	dfResult <- removeCorruptEntries(dfCsvEntries)
+	dfResult <- fixSatGranularity(dfResult)
+	dfResult <- rescaleSatGranularity(dfResult)
+	return(dfResult)
+}
+
+# Removes specific entries which are known to be incorrect
 removeCorruptEntries <- function(dfCsvEntries){
 	dfResult <- dfCsvEntries
 	# Corrupt models for sat-granularity=1
@@ -27,6 +36,7 @@ removeCorruptEntries <- function(dfCsvEntries){
 	return(dfResult)
 }
 
+# Sets sat.granularity according to the value of state.vector.length
 fixSatGranularity <- function(dfCsvEntries){
 	# Derive state_vector_length for models with at least one solved instance, otherwise set derivedSvl to NA.
 	mapSvl <- ddply(.parallel=TRUE, dfCsvEntries, "filename", summarize, derivedSvl = mean(state.vector.length, na.rm=TRUE))
@@ -36,5 +46,15 @@ fixSatGranularity <- function(dfCsvEntries){
 	dfResult$sat.granularity <- ifelse(!is.na(dfResult$derivedSvl) & dfResult$sat.granularity >= dfResult$derivedSvl, MAXINT, dfResult$sat.granularity)
 	# Remove derived svl
 	dfResult <- dfResult[,names(dfCsvEntries)]
+	return(dfResult)
+}
+
+# Rewrittes sat.granularity as String which is better for drawing diagrams
+rescaleSatGranularity <- function(dfCsvEntries){
+	dfResult <- dfCsvEntries
+	# Rename MAXINT to "max"
+	dfResult$sat.granularity <- ifelse(dfResult$sat.granularity == MAXINT, "max", dfResult$sat.granularity)
+	# Add leading zeros for better sorting
+	dfResult$sat.granularity <- ifelse(nchar(dfResult$sat.granularity) == 1, paste0("0",dfResult$sat.granularity), dfResult$sat.granularity)
 	return(dfResult)
 }

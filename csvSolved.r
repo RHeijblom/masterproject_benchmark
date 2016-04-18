@@ -98,8 +98,7 @@ drawVenn <- function(dfSolvable, file){
 args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
 source("./dataUtils.r")
-inputData <- removeCorruptEntries(inputData)
-inputData <- fixSatGranularity(inputData)
+inputData <- preprocessAll(inputData)
 
 # Remove statistics data and irrelevant columns
 data <- subset(inputData, type=="performance")
@@ -107,12 +106,12 @@ data <- subset(data, select=c("filename","order","sat.granularity","status"))
 # Abstract status
 data$solved <- data$status == "done"
 # Flatten models
-data <- ddply(.parallel=TRUE, data, c("filename","order","sat.granularity"), summarize, totalSolved = sum(solved))
+data <- ddply(.parallel=TRUE, data, c("filename","order","sat.granularity"), summarize, totalSolved=sum(solved), size=length(solved))
 # Abstract whether a model can be solved
 acceptRate <- 5 # Minimum number of models which have to be solved (currently 5/10)
-data$solved <- data$totalSolved >= acceptRate
+data$solved <- 10*data$totalSolved >= acceptRate*data$size
 data <- subset(data, select=c("filename","order","sat.granularity","solved"))
-# data: filename X order X sat.granularity -> Boolean (solved)
+# data: filename X order X sat.granularity -> Boolean (solved) (NOTE: not complete due to removal of corrupt entries)
 
 # Solved by any granularity
 dataAny <- ddply(.parallel=TRUE, data, c("filename","order"), summarize, solved = sum(solved) >= 1)
@@ -124,7 +123,7 @@ listPerCategory(dataAnySplit)
 dataFreq <- ddply(.parallet=TRUE, data, c("order","sat.granularity"), summarize, frequency=sum(solved))
 ggplot(dataFreq) + 
 	# Data
-	geom_line(aes(x=sat.granularity, y=frequency, color=order)) +
+	geom_point(aes(x=sat.granularity, y=frequency, color=order)) +
 	# Aes
 	labs(title="Performance Overview") +
 	xlab("Saturation granularity") +
@@ -149,25 +148,29 @@ print("OVERVIEW COMBINING ALL GRANULARITIES")
 print("")
 
 # Determine static models
-randomGran <- data$sat.granularity[1]
-dataStatic <- rankOrders(subset(data, sat.granularity == randomGran))
-dataStatic$isStatic <- TRUE
-
-for(gran in unique(data$sat.granularity)){
-	print(gran)
-	dataGran <- rankOrders(subset(data, sat.granularity == gran))
-	dataStatic$isStatic <- dataStatic$isStatic & dataStatic$bfs == dataGran$bfs & dataStatic$bfsprev == dataGran$bfsprev & dataStatic$chain == dataGran$chain & dataStatic$chainprev == dataGran$chainprev
-}
-
-dataDynamic <- merge(data, dataStatic, c("filename"))
+dataStatic <- ddply(.parallel=TRUE, data, c("filename","order"), summarize, 
+					# True iff solved by all different granularities
+					solvedAND=all(solved), 
+					# True iff cannot be solved by any granularity
+					solvedNOR=!(any(solved)))
+# solved is only usefull for static models
+dataStatic$solved <- dataStatic$solvedAND
+dataRankedStatic <- rankOrders(dataStatic)
+# dataStatic: filename -> boolean (isStatic)
+dataStatic$isStatic <- dataStatic$solvedAND | dataStatic$solvedNOR
+dataStatic <- ddply(.parallel=TRUE, dataStatic, "filename", summarize, isStatic=all(isStatic))
+# Remove all non static models
+dataRankedStatic <- merge(dataRankedStatic, dataStatic, "filename")
+dataRankedStatic <- subset(dataRankedStatic, isStatic)
 
 # Display static models
-dataStatic <- subset(dataStatic, isStatic)
-print(paste0("STATIC MODELS (",nrow(dataStatic)," entries):"))
+print(paste0("STATIC MODELS (",nrow(dataRankedStatic)," entries):"))
 print("")
-listPerCategory(dataStatic)
+listPerCategory(dataRankedStatic)
 
-# Analyze dynamic models
+# Determine dynamic models
+dataDynamic <- subset(dataStatic, select=c("filename","isStatic"))
+dataDynamic <- merge(dataDynamic, data, "filename")
 dataDynamic <- subset(dataDynamic, !isStatic)
 
 # Display set per granularity
