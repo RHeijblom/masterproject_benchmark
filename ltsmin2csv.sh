@@ -242,9 +242,31 @@ for file in $(find "$INPUT_DIR" -type f); do
 				has_found_status=true
 			fi
 		fi
-		# Check last line "vrel_add_act not supported; falling back to vrel_add_cpy"
+		# Check Killed[15]
 		if ! $has_found_status; then
-			tail -n1 "$file" | grep "vrel_add_act not supported; falling back to vrel_add_cpy" > /dev/null
+			grep "Killed \[15\]" "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				status="\"ootime\","
+				status_spec="\"killed15\","
+				has_found_status=true
+				info_reachability=2
+			fi
+		fi
+		# No response; check last line
+		# Check last line during regrouping
+		if ! $has_found_status; then
+			tail -n1 "$file" | grep "Regroup Boost's Sloan\|: bandwidth:\|: profile:\|: span:\|: average wavefront:\|: RMS wavefront:\|: Regrouping:" > /dev/null
+			if [ $? -eq 0 ]; then 
+				status="\"ootime\","
+				status_spec="\"noresponse\","
+				has_memstats=false
+				info_reachability=2
+				has_found_status=true
+			fi
+		fi
+		# Check last line during initialisation of symbolic backend
+		if ! $has_found_status; then
+			tail -n1 "$file" | grep "Creating a multi-core ListDD domain.\|Using GBgetTransitionsShortR2W as next-state function\|got initial state\|vrel_add_act not supported; falling back to vrel_add_cpy" > /dev/null
 			if [ $? -eq 0 ]; then 
 				status="\"ootime\","
 				status_spec="\"noresponse\","
