@@ -9,7 +9,7 @@ CHECK_NATURE_FLAG=true
 # Header
 FIXED_HEADER='"sat-granularity","save-sat-levels","next-union",'
 # Values
-FIXED_VALUES='"","true","true",'
+FIXED_VALUES='"5","true","false",'
 # Regroup is fixed during experiment and MAY not be extracted from filename
 has_regroup=true
 
@@ -129,7 +129,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 		if ! $has_found_status; then
 			grep "Exit \[1\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
-				grep "cache: Unable to allocate memory!" "$file" > /dev/null
+				grep "cache: Unable to allocate memory!" "$file" > /dev/null # LEGACY?
 				if [ $? -eq 0 ]; then 
 					status="\"oomem\","
 					status_spec="\"cache\","
@@ -141,6 +141,15 @@ for file in $(find "$INPUT_DIR" -type f); do
 					if [ $? -eq 0 ]; then 
 						status="\"oomem\","
 						status_spec="\"mddtable\","
+						info_reachability=3
+						has_found_status=true
+					fi
+				fi
+				if ! $has_found_status; then
+					grep "Unable to allocate memory: Cannot allocate memory!" "$file" > /dev/null
+					if [ $? -eq 0 ]; then 
+						status="\"oomem\","
+						status_spec="\"alloc\","
 						info_reachability=3
 						has_found_status=true
 					fi
