@@ -9,7 +9,7 @@ CHECK_NATURE_FLAG=true
 # Header
 FIXED_HEADER='"sat-granularity","save-sat-levels","next-union",'
 # Values
-FIXED_VALUES='"5","true","false",'
+FIXED_VALUES='"20","true","false",'
 # Regroup is fixed during experiment and MAY not be extracted from filename
 has_regroup=true
 

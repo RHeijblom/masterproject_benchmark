@@ -1,0 +1,95 @@
+pnml2lts-sym, 0.000: Exploration order is chain
+pnml2lts-sym, 0.000: Saturation strategy is sat-like
+pnml2lts-sym, 0.000: Guided search strategy is unguided
+pnml2lts-sym, 0.000: Attractor strategy is default
+pnml2lts-sym, 0.000: opening /home/s1083392/experiments/in/ptAll/rwmutex-r2000w10.pnml
+pnml2lts-sym, 1.598: Petri net has 6020 places, 4020 transitions and 52040 arcs
+pnml2lts-sym, 1.598: There are 0 safe places
+pnml2lts-sym, 3.325: Petri net /home/s1083392/experiments/in/ptAll/rwmutex-r2000w10.pnml analyzed
+pnml2lts-sym, 4.131: Loading Petri net took 4.130 real 0.450 user 0.060 sys
+pnml2lts-sym, 4.131: Initializing regrouping layer
+pnml2lts-sym, 4.194: Regroup specification: tg,bs,hf
+pnml2lts-sym, 4.195: Regroup Total graph
+pnml2lts-sym, 4.195: Regroup Boost's Sloan
+pnml2lts-sym, 569.273: Reqroup Horizontal Flip
+pnml2lts-sym, 569.307: Regrouping: 4020->4020 groups
+pnml2lts-sym, 575.937: Regrouping took 571.800 real 71.720 user 0.160 sys
+pnml2lts-sym, 575.937: state vector length is 6020; there are 4020 groups
+pnml2lts-sym, 575.937: Creating a multi-core ListDD domain.
+pnml2lts-sym, 576.044: Using GBgetTransitionsShortR2W as next-state function
+pnml2lts-sym, 627.720: got initial state
+pnml2lts-sym, 633.912: vrel_add_act not supported; falling back to vrel_add_cpy
+*** segmentation fault ***
+
+Please send information on how to reproduce this problem to: 
+         ltsmin-support@lists.utwente.nl
+along with all output preceding this message.
+In addition, include the following information:
+Package: ltsmin 2.2beta
+Stack trace:
+  0: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x429eca]
+  1: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x429f46]
+  2: /lib/x86_64-linux-gnu/libpthread.so.0(+0x10340) [0x7f60f8e00340]
+  3: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4386ad]
+  4: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x431473]
+  5: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x40c21b]
+  6: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4a0a82]
+  7: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c9879]
+  8: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+  9: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 10: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 11: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 12: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 13: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 14: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 15: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 16: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 17: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 18: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 19: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 20: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 21: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 22: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 23: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 24: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 25: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 26: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 27: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 28: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 29: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 30: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 31: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 32: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 33: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 34: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 35: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 36: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 37: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 38: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 39: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 40: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 41: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 42: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 43: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 44: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 45: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 46: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 47: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 48: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 49: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 50: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 51: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 52: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 53: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 54: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 55: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 56: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 57: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 58: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 59: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 60: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 61: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 62: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+ 63: /home/s1083392/bin/ltsminPerf/bin/pnml2lts-sym() [0x4c975a]
+Exit [255]
+102.89 user, 1.11 system, 828.80 elapsed -- Max VSize = 6779640KB, Max RSS = 3370152KB
