@@ -1,0 +1,57 @@
+pnml2lts-sym, 0.000: Exploration order is chain
+pnml2lts-sym, 0.000: Saturation strategy is sat-like
+pnml2lts-sym, 0.000: Guided search strategy is unguided
+pnml2lts-sym, 0.000: Attractor strategy is default
+pnml2lts-sym, 0.000: opening /home/s1083392/experiments/in/ptAll/open_system_0.pnml
+pnml2lts-sym, 0.008: Petri net has 198 places, 176 transitions and 730 arcs
+pnml2lts-sym, 0.008: There are 0 safe places
+pnml2lts-sym, 0.010: Petri net /home/s1083392/experiments/in/ptAll/open_system_0.pnml analyzed
+pnml2lts-sym, 0.068: Loading Petri net took 0.070 real 0.010 user 0.010 sys
+pnml2lts-sym, 0.068: Initializing regrouping layer
+pnml2lts-sym, 0.068: Regroup specification: tg,bs,hf
+pnml2lts-sym, 0.068: Regroup Total graph
+pnml2lts-sym, 0.068: Regroup Boost's Sloan
+pnml2lts-sym, 0.142: bandwidth: 558
+pnml2lts-sym, 0.142: profile: 55863
+pnml2lts-sym, 0.143: span: 65035
+pnml2lts-sym, 0.429: average wavefront: 21.4464
+pnml2lts-sym, 0.634: RMS wavefront: 23.9588
+pnml2lts-sym, 0.672: Reqroup Horizontal Flip
+pnml2lts-sym, 0.672: Regrouping: 176->176 groups
+pnml2lts-sym, 0.673: Regrouping took 0.610 real 0.060 user 0.000 sys
+pnml2lts-sym, 0.673: state vector length is 198; there are 176 groups
+pnml2lts-sym, 0.673: Creating a multi-core ListDD domain.
+pnml2lts-sym, 0.872: Using GBgetTransitionsShortR2W as next-state function
+pnml2lts-sym, 1.779: got initial state
+pnml2lts-sym, 5.302: vrel_add_act not supported; falling back to vrel_add_cpy
+pnml2lts-sym, 36.186: Exploration took 28145 group checks and 28145 next state calls
+pnml2lts-sym, 36.186: reachability took 34.410 real 3.790 user 0.430 sys
+pnml2lts-sym, 36.186: counting visited states...
+pnml2lts-sym, 36.186: counting took 0.000 real 0.000 user 0.000 sys
+pnml2lts-sym, 36.186: state space has 2776936 states, 3577 nodes
+pnml2lts-sym, 36.186: ( 3577 final BDD nodes; 6554 peak nodes )
+pnml2lts-sym, 36.186: group_next: 1250 nodes total
+pnml2lts-sym, 36.186: group_explored: 1670 nodes, 911 short vectors total
+*** Sylvan stats ***
+LDD operations count (cache reuse, cache put)
+Union: 3316738 (471650, 2845088)
+RelProd: 5018251 (922301, 4095950)
+SatCount: 92442 (17680, 74762)
+SatCountL: 258 (173, 85)
+ProjectMinus: 5996139 (1102403, 4893736)
+LDD Nodes created: 988967
+LDD Nodes reused: 4712787
+
+Garbage collection
+Number of GC executions: 0
+Total time spent: 0.000000 sec.
+
+Tables
+Unique nodes table: 988969 of 67108864 buckets filled.
+Operation cache: 10854391 of 67108864 buckets filled.
+
+Unique table
+Number of lookup iterations: 29027302
+pnml2lts-sym, 37.493: max token count: 1
+Exit [0]
+4.04 user, 0.58 system, 37.56 elapsed -- Max VSize = 6631700KB, Max RSS = 2909668KB
