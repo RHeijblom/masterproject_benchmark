@@ -1,0 +1,43 @@
+dve2lts-sym, 0.000: Exploration order is chain-prev
+dve2lts-sym, 0.000: Saturation strategy is sat-like
+dve2lts-sym, 0.000: Guided search strategy is unguided
+dve2lts-sym, 0.000: Attractor strategy is default
+dve2lts-sym, 0.000: Precompiled divine module initialized
+dve2lts-sym, 0.000: opening /home/s1083392/experiments/in/dveAll/iprotocol.6.dve2C
+dve2lts-sym, 0.012: Initializing regrouping layer
+dve2lts-sym, 0.012: Regroup specification: tg,bs,hf
+dve2lts-sym, 0.012: Regroup Total graph
+dve2lts-sym, 0.012: Regroup Boost's Sloan
+dve2lts-sym, 0.013: bandwidth: 114
+dve2lts-sym, 0.013: profile: 7573
+dve2lts-sym, 0.013: span: 8578
+dve2lts-sym, 0.014: average wavefront: 10.371
+dve2lts-sym, 0.020: RMS wavefront: 11.082
+dve2lts-sym, 0.020: Reqroup Horizontal Flip
+dve2lts-sym, 0.020: Regrouping: 35->35 groups
+dve2lts-sym, 0.039: Regrouping took 0.030 real 0.000 user 0.000 sys
+dve2lts-sym, 0.039: state vector length is 37; there are 35 groups
+dve2lts-sym, 0.039: Creating a multi-core ListDD domain.
+dve2lts-sym, 0.356: Using GBgetTransitionsShortR2W as next-state function
+dve2lts-sym, 1.182: got initial state
+dve2lts-sym, 2.481: vrel_add_act not supported; falling back to vrel_add_cpy
+*** segmentation fault ***
+
+Please send information on how to reproduce this problem to: 
+         ltsmin-support@lists.utwente.nl
+along with all output preceding this message.
+In addition, include the following information:
+Package: ltsmin 2.2beta
+Stack trace:
+  0: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x42846a]
+  1: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x4284e6]
+  2: /lib/x86_64-linux-gnu/libpthread.so.0(+0x10330) [0x7fae961c8330]
+  3: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x410aba]
+  4: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x408b54]
+  5: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x4178a0]
+  6: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x41836e]
+  7: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x4add82]
+  8: /lib/x86_64-linux-gnu/libpthread.so.0(+0x8184) [0x7fae961c0184]
+  9: /lib/x86_64-linux-gnu/libc.so.6(clone+0x6d) [0x7fae956c237d]
+Exit [255]
+0.02 user, 0.58 system, 4.80 elapsed -- Max VSize = 6633840KB, Max RSS = 2893080KB
