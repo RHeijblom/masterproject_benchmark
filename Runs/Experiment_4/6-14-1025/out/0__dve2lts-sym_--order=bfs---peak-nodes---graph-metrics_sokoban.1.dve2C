@@ -1,0 +1,43 @@
+dve2lts-sym, 0.000: Exploration order is bfs
+dve2lts-sym, 0.000: Saturation strategy is sat-loop
+dve2lts-sym, 0.000: Guided search strategy is unguided
+dve2lts-sym, 0.000: Attractor strategy is default
+dve2lts-sym, 0.000: Precompiled divine module initialized
+dve2lts-sym, 0.000: opening /home/s1083392/experiments/in/dveAll/sokoban.1.dve2C
+dve2lts-sym, 0.008: Initializing regrouping layer
+dve2lts-sym, 0.008: Regroup specification: tg,bs,hf
+dve2lts-sym, 0.008: Regroup Total graph
+dve2lts-sym, 0.008: Regroup Boost's Sloan
+dve2lts-sym, 0.011: bandwidth: 328
+dve2lts-sym, 0.011: profile: 56388
+dve2lts-sym, 0.012: span: 57746
+dve2lts-sym, 0.088: average wavefront: 8.78063
+dve2lts-sym, 0.091: RMS wavefront: 8.86492
+dve2lts-sym, 0.160: Reqroup Horizontal Flip
+dve2lts-sym, 0.160: Regrouping: 9->9 groups
+dve2lts-sym, 0.167: Regrouping took 0.160 real 0.000 user 0.000 sys
+dve2lts-sym, 0.167: state vector length is 68; there are 9 groups
+dve2lts-sym, 0.167: Creating a multi-core ListDD domain.
+dve2lts-sym, 0.416: Using GBgetTransitionsShortR2W as next-state function
+dve2lts-sym, 1.203: got initial state
+*** segmentation fault ***
+
+Please send information on how to reproduce this problem to: 
+         ltsmin-support@lists.utwente.nl
+along with all output preceding this message.
+In addition, include the following information:
+Package: ltsmin 2.2beta
+Stack trace:
+  0: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x42846a]
+  1: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x4284e6]
+  2: /lib/x86_64-linux-gnu/libpthread.so.0(+0x10330) [0x7f95a0ab8330]
+  3: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x48e900]
+  4: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x410677]
+  5: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x408b54]
+  6: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x4178a0]
+  7: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x41836e]
+  8: /home/s1083392/bin/ltsminStat/bin/dve2lts-sym() [0x4add82]
+  9: /lib/x86_64-linux-gnu/libpthread.so.0(+0x8184) [0x7f95a0ab0184]
+ 10: /lib/x86_64-linux-gnu/libc.so.6(clone+0x6d) [0x7f959ffb237d]
+Exit [255]
+0.03 user, 0.12 system, 1.30 elapsed -- Max VSize = 6633792KB, Max RSS = 476272KB
