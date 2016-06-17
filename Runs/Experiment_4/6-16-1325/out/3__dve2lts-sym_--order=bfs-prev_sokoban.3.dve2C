@@ -1,0 +1,38 @@
+dve2lts-sym, 0.000: Exploration order is bfs-prev
+dve2lts-sym, 0.000: Saturation strategy is sat-loop
+dve2lts-sym, 0.000: Guided search strategy is unguided
+dve2lts-sym, 0.000: Attractor strategy is default
+dve2lts-sym, 0.000: Precompiled divine module initialized
+dve2lts-sym, 0.000: opening /home/s1083392/experiments/in/dveAll/sokoban.3.dve2C
+dve2lts-sym, 0.008: Initializing regrouping layer
+dve2lts-sym, 0.008: Regroup specification: tg,bs,hf
+dve2lts-sym, 0.008: Regroup Total graph
+dve2lts-sym, 0.008: Regroup Boost's Sloan
+dve2lts-sym, 0.314: Reqroup Horizontal Flip
+dve2lts-sym, 0.314: Regrouping: 9->9 groups
+dve2lts-sym, 0.315: Regrouping took 0.310 real 0.030 user 0.000 sys
+dve2lts-sym, 0.315: state vector length is 213; there are 9 groups
+dve2lts-sym, 0.315: Creating a multi-core ListDD domain.
+dve2lts-sym, 0.456: Using GBgetTransitionsShortR2W as next-state function
+dve2lts-sym, 5.159: got initial state
+*** segmentation fault ***
+
+Please send information on how to reproduce this problem to: 
+         ltsmin-support@lists.utwente.nl
+along with all output preceding this message.
+In addition, include the following information:
+Package: ltsmin 2.2beta
+Stack trace:
+  0: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x4283ea]
+  1: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x428466]
+  2: /lib/x86_64-linux-gnu/libpthread.so.0(+0x10330) [0x7fbe3aea8330]
+  3: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x48e880]
+  4: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x410627]
+  5: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x408b04]
+  6: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x417850]
+  7: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x41831e]
+  8: /home/s1083392/bin/ltsminPerf/bin/dve2lts-sym() [0x4add02]
+  9: /lib/x86_64-linux-gnu/libpthread.so.0(+0x8184) [0x7fbe3aea0184]
+ 10: /lib/x86_64-linux-gnu/libc.so.6(clone+0x6d) [0x7fbe3a3a237d]
+Exit [255]
+0.04 user, 0.61 system, 5.30 elapsed -- Max VSize = 6633820KB, Max RSS = 365032KB
