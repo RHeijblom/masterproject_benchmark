@@ -10,18 +10,18 @@ ADD_FIXED_PROP=false
 FIXED_HEADER='"save-sat-levels","next-union",'
 # Values
 FIXED_VALUES='"true","false",'
-UNKNOWN_VALUE="\"unknown\","
-EMPTY_VALUE="\"\","
-OOTIME_VALUE="\"ootime\","
-OOMEM_VALUE="\"oomem\","
-ERROR_VALUE="\"error\","
+UNKNOWN_VALUE='"unknown",'
+EMPTY_VALUE='"",'
+OOTIME_VALUE='"ootime",'
+OOMEM_VALUE='"oomem",'
+ERROR_VALUE='"error",'
 # Regroup is fixed during experiment and MAY not be extracted from filename
 has_regroup=true
 
 # VERIFY CORRECT USAGE
 
 # If usage is incorrect, print script use and exit
-if [ "$#" -lt 3 ]; then
+if [ $# -lt 3 ]; then
   >&2 echo "Combines the outputfiles in a directory into a single csv file"
   >&2 echo "Usage: $0 <outputdirectory> <ltsmin_binary> <result>.csv [<sat-gran>]"
   exit 1
@@ -48,9 +48,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # Use $4 as sat-granularity instead of extracting this value from the file
-SAT_GRAN_VAL=0
-if [ "S#" -gt 3 ]; then
-	SAT_GRAN_VAL=$4
+SAT_GRAN_VALUE=0
+if [ $# -gt 3 ]; then
+	SAT_GRAN_VALUE=$4
 fi
 
 # Helper method to add empty values
@@ -69,8 +69,8 @@ function padvalue() {
 # START CSV FILE CREATION
 
 # Print csv header
->"$OUTPUT_FILE" echo -n '"type","status","status-spec","order","saturation","sat-granularity"'
-if [ ADD_FIXED_PROP ]; then
+>"$OUTPUT_FILE" echo -n '"type","status","status-spec","order","saturation","sat-granularity",'
+if $ADD_FIXED_PROP; then
 	>>"$OUTPUT_FILE" echo -n "$FIXED_HEADER"
 fi
 >>"$OUTPUT_FILE" echo -n '"filename","filetype","regroup-strategy","regroup-time",'
@@ -78,7 +78,7 @@ fi
 >>"$OUTPUT_FILE" echo -n '"state-vector-length","groups","group-checks","next-state-calls","reachability-time",'
 >>"$OUTPUT_FILE" echo -n '"statespace-states","statespace-nodes","group-next","group-explored-nodes","group-explored-vectors",'
 >>"$OUTPUT_FILE" echo -n '"time","memory",'
->>"$OUTPUT_FILE" echo '"peak-nodes","LDDop-relProd","LDDop-satCount","LDDop-satCountL","LDDop-relProdUnion","LDDop-projectMinus",'
+>>"$OUTPUT_FILE" echo '"peak-nodes","LDDop-union","LDDop-minus","LDDop-relProd","LDDop-satCount","LDDop-satCountL","LDDop-zip","LDDop-relProdUnion","LDDop-projectMinus",'
 
 # Analyse all files
 for file in $(find "$INPUT_DIR" -type f); do
@@ -309,11 +309,24 @@ for file in $(find "$INPUT_DIR" -type f); do
 		
 		# SAT-GRANULARITY
 		
-		# ???
+		if [ $SAT_GRAN_VALUE -eq 0 ]; then
+			# Read sat-granularity from file name
+			basename "$file" | grep "\-\-sat\-granularity=" > /dev/null
+			if [ $? -eq 0 ]; then
+				sat=$(basename "$file" | grep -o "\-\-sat\-granularity=[[:digit:]]*")
+				sat="${sat##*=}"
+				>>"$OUTPUT_FILE" echo -n "\"$sat\","
+			else
+				>>"$OUTPUT_FILE" echo -n "$UNKNOWN_VALUE"
+			fi
+		else
+			# Use given fixed value for sat-granularity
+			>>"$OUTPUT_FILE" echo -n "\"$SAT_GRAN_VALUE\","
+		fi
 		
 		# FIXED VALUES
 		
-		if [ ADD_FIXED_PROP ]; then
+		if $ADD_FIXED_PROP; then
 			>>"$OUTPUT_FILE" echo -n "$FIXED_VALUES"
 		fi
 		
@@ -321,7 +334,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 		
 		grep ": opening " "$file" > /dev/null
 		if [ $? -eq 0 ]; then 
-			filename=$(awk '{ if ($3 == "opening") { "basename "$4 | getline name ; printf "\"%s\",", name } }' "$file")
+			filename=$(awk '{ if ($3 == "opening") { "basename "$4 | getline name ; printf "%s", name } }' "$file")
 			# 'Magic' snatched from http://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
 			model="${filename%.*}"
 			extension="${filename##*.}"
@@ -418,39 +431,77 @@ for file in $(find "$INPUT_DIR" -type f); do
 			padvalue "$OUTPUT_FILE" 5
 		fi
 		
+		# STATE-VECTOR-LENGTH and GROUPS
 		
-		if [ $info_reachability -ge 3 ]; then
+		grep ": state vector length is " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
 			awk '{
-				# STATE VECTOR LENGTH and GROUPS
 				if ($3" "$4" "$5" "$6 == "state vector length is") printf "\"%s\",\"%s\",", substr($7, 1, length($7)-1), $10
 			}' "$file" >>"$OUTPUT_FILE"
 		else
-			# Pad missing info
-			padvalue "$OUTPUT_FILE" 3
+			# No dependency matrix size
+			padvalue "$OUTPUT_FILE" 2
 		fi
 		
-		if [ $info_reachability -ge 4 ]; then
+		# GROUP-CHECKS and NEXT-STATE-CALLS
+		
+		grep ": Exploration took " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
 			awk '{
-				# GROUP CHECKS and NEXT STATE CALLS
 				if ($3" "$4 == "Exploration took") printf "\"%s\",\"%s\",", $5, $9
-				# REACHABILITY TIME
-				else if ($3" "$4 == "reachability took") printf "\"%s\",", $7
-				# STATESPACE STATES and NODES
-				else if ($3" "$4" "$5 == "state space has") printf "\"%s\",\"%s\",", $6, $8
-				# GROUP NEXT
-				else if ($3 == "group_next:") printf "\"%s\",", $4
-				# GROUP EXPLORED NODES and VECTORS
-				else if ($3 == "group_explored:") printf "\"%s\",\"%s\",", $4, $6
-				# MAX TOKEN COUNT
-				else if ($3" "$4" "$5 == "max token count:") printf "\"%s\",", $6
-	    	}' "$file" >>"$OUTPUT_FILE"
+			}' "$file" >>"$OUTPUT_FILE"
 		else
-			padvalue "$OUTPUT_FILE" 9
+			padvalue "$OUTPUT_FILE" 2
+		fi
+		
+		# REACHABILITY-TIME
+		
+		grep ": reachability took " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			awk '{
+				if ($3" "$4 == "reachability took") printf "\"%s\",", $7
+			}' "$file" >>"$OUTPUT_FILE"
+		else
+			padvalue "$OUTPUT_FILE"
+		fi
+		
+		# STATESPACE-STATES and -NODES
+		
+		grep ": state space has " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			awk '{
+				if ($3" "$4" "$5 == "state space has") printf "\"%s\",\"%s\",", $6, $8
+			}' "$file" >>"$OUTPUT_FILE"
+		else
+			padvalue "$OUTPUT_FILE" 2
+		fi
+		
+		# GROUP-NEXT
+		
+		grep ": group_next: " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			awk '{
+				if ($3 == "group_next:") printf "\"%s\",", $4
+			}' "$file" >>"$OUTPUT_FILE"
+		else
+			padvalue "$OUTPUT_FILE"
+		fi
+		
+		# GROUP-EXPLORED-NODES and -VECTORS
+		
+		grep ": group_explored: " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			awk '{
+				if ($3 == "group_explored:") printf "\"%s\",\"%s\",", $4, $6
+			}' "$file" >>"$OUTPUT_FILE"
+		else
+			padvalue "$OUTPUT_FILE" 2
 		fi
 		
 		# MEMTIME STATISTICS
 		
-		if $has_memstats; then
+		cat "$file" | tail -n1 | grep " elapsed -- Max VSize = " > /dev/null
+		if [ $? -eq 0 ]; then
 			awk '{
 				# RUNTIME and MEMORY FOOTPRINT
 				if ($2 == "user," && $4 == "system," && $6 == "elapsed") printf "\"%s\",\"%s\",", $1, substr($15, 1, length($15) - 2)
@@ -459,24 +510,98 @@ for file in $(find "$INPUT_DIR" -type f); do
 			padvalue "$OUTPUT_FILE" 2
 		fi
 		
-		# SYLVAN STATISTICS
+		# PEAK-NODES
 		
-		if $has_sylvanstats && [ $info_reachability -ge 4 ]; then
+		grep " final BDD nodes; " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
 			awk '{
-				# PEAKNODES
-				if ($5" "$6" "$7 == "final BDD nodes;" && $9" "$10" "$11 == "peak nodes )") printf "\"%s\",", $8
-				# BDD OPERATIONS (rel prod, sat count, sat count l, rel prod union, project minus)
-				else if ($1 == "RelProd:") printf "\"%s\",",  $2
-				else if ($1 == "SatCount:") printf "\"%s\",",  $2
-				else if ($1 == "SatCountL:") printf "\"%s\",",  $2
-				else if ($1 == "RelProdUnion:") printf "\"%s\",",  $2
-				else if ($1 == "ProjectMinus:") printf "\"%s\",",  $2
-	    	}' "$file" >>"$OUTPUT_FILE"
+				if ($5" "$6" "$7 == "final BDD nodes;" && $9" "$10 == "peak nodes;") printf "\"%s\",", $8
+			}' "$file" >>"$OUTPUT_FILE"
 		else
-			padvalue "$OUTPUT_FILE" 6
+			padvalue "$OUTPUT_FILE"
 		fi
 		
-		# New line
+		# SYLVAN STATISTICS
+		
+		grep "LDD operations count (cache reuse, cache put)" "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			# UNION
+			grep "Union: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "Union:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# MINUS
+			grep "Minus: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "Minus:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# RELPROD
+			grep "RelProd: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "RelProd:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# SATCOUNT
+			grep "SatCount: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "SatCount:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# SATCOUNTL
+			grep "SatCountL: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "SatCountL:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# ZIP
+			grep "Zip: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "Zip:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# RELPRODUNION
+			grep "RelProdUnion: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "RelProdUnion:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+			# POJECTMINUS
+			grep "ProjectMinus: " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
+				awk '{
+					if ($1 == "ProjectMinus:") printf "\"%s\",",  $2
+				}' "$file" >>"$OUTPUT_FILE"
+			else
+				padvalue "$OUTPUT_FILE"
+			fi
+		else
+			padvalue "$OUTPUT_FILE" 7
+		fi
+		
+		# New line in order to finish current row
 		>>"$OUTPUT_FILE" echo ""
 	fi
 done
