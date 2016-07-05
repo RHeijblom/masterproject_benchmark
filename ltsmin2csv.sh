@@ -1,24 +1,33 @@
 #!/bin/bash
-# Name of the binary of LTSmin used for simulation. This var determines the identification of result produced by ltsminStat
-LTSMIN_BIN="pnml2lts-sym"
+# HARDCODED CONTROL PARAMETERS
 
 # Flag to force each file to be checked if produced by $LTSMIN_BIN; files failing this condition will be notified to the user
 CHECK_NATURE_FLAG=true
 
 # Fixed values during testing
+ADD_FIXED_PROP=false
 # Header
-FIXED_HEADER='"sat-granularity","save-sat-levels","next-union",'
+FIXED_HEADER='"save-sat-levels","next-union",'
 # Values
-FIXED_VALUES='"20","true","false",'
+FIXED_VALUES='"true","false",'
+UNKNOWN_VALUE="\"unknown\","
+EMPTY_VALUE="\"\","
+OOTIME_VALUE="\"ootime\","
+OOMEM_VALUE="\"oomem\","
+ERROR_VALUE="\"error\","
 # Regroup is fixed during experiment and MAY not be extracted from filename
 has_regroup=true
 
+# VERIFY CORRECT USAGE
+
 # If usage is incorrect, print script use and exit
-if [ "$#" -ne 2 ]; then
+if [ "$#" -lt 3 ]; then
   >&2 echo "Combines the outputfiles in a directory into a single csv file"
-  >&2 echo "Usage: $0 <outputdirectory> <result>.csv"
+  >&2 echo "Usage: $0 <outputdirectory> <ltsmin_binary> <result>.csv [<sat-gran>]"
   exit 1
 fi
+
+# VERIFY PROGRAM ARGUMENTS
 
 # Validate input directory
 INPUT_DIR=$1
@@ -27,12 +36,21 @@ if [ ! -d "$INPUT_DIR" ]; then
 	exit 1
 fi
 
+# Name of the binary of LTSmin used for simulation. This var determines the identification of result produced by ltsminStat
+LTSMIN_BIN=$2
+
 # Validate output_file
-OUTPUT_FILE=$2
+OUTPUT_FILE=$3
 touch "$OUTPUT_FILE"
 if [ $? -ne 0 ]; then
 	>&2 echo "Cannot create or modify $OUTPUT_FILE."
 	exit 1
+fi
+
+# Use $4 as sat-granularity instead of extracting this value from the file
+SAT_GRAN_VAL=0
+if [ "S#" -gt 3 ]; then
+	SAT_GRAN_VAL=$4
 fi
 
 # Helper method to add empty values
@@ -44,19 +62,23 @@ function padvalue() {
 		repeat=$2
 	fi
 	for v in `seq 1 $repeat`; do
-		>>"$1" echo -n "\"\","
+		>>"$1" echo -n "$EMPTY_VALUE"
 	done
 }
 
+# START CSV FILE CREATION
+
 # Print csv header
->"$OUTPUT_FILE" echo -n '"type","status","status-spec","order","saturation",'
->>"$OUTPUT_FILE" echo -n "$FIXED_HEADER"
->>"$OUTPUT_FILE" echo -n '"filename","PT-places","PT-transitions","PT-arcs","PT-safeplaces","regroup-strategy","regroup-time",'
->>"$OUTPUT_FILE" echo -n '"state-vector-length","groups","group-checks","next-state-calls","reachability-time",'
->>"$OUTPUT_FILE" echo -n '"statespace-states","statespace-nodes","group-next","group-explored-nodes","group-explored-vectors","max-tokens",'
->>"$OUTPUT_FILE" echo -n '"time","memory",'
+>"$OUTPUT_FILE" echo -n '"type","status","status-spec","order","saturation","sat-granularity"'
+if [ ADD_FIXED_PROP ]; then
+	>>"$OUTPUT_FILE" echo -n "$FIXED_HEADER"
+fi
+>>"$OUTPUT_FILE" echo -n '"filename","filetype","regroup-strategy","regroup-time",'
 >>"$OUTPUT_FILE" echo -n '"bandwidth","profile","span","average-wavefront","RMS-wavefront",'
->>"$OUTPUT_FILE" echo '"peak-nodes","BDD-relProd","BDD-satCount","BDD-satCountL","BDD-relProdUnion","BDD-projectMinus",'
+>>"$OUTPUT_FILE" echo -n '"state-vector-length","groups","group-checks","next-state-calls","reachability-time",'
+>>"$OUTPUT_FILE" echo -n '"statespace-states","statespace-nodes","group-next","group-explored-nodes","group-explored-vectors",'
+>>"$OUTPUT_FILE" echo -n '"time","memory",'
+>>"$OUTPUT_FILE" echo '"peak-nodes","LDDop-relProd","LDDop-satCount","LDDop-satCountL","LDDop-relProdUnion","LDDop-projectMinus",'
 
 # Analyse all files
 for file in $(find "$INPUT_DIR" -type f); do
@@ -73,28 +95,19 @@ for file in $(find "$INPUT_DIR" -type f); do
 	fi
 	
 	if $do_analyse_file; then
-		# Bookkeeping vars to indicate which information is available in the file
-		has_memstats=true
-		has_sylvanstat=false
-		# 1 - Till safe places (failure parsing PT)
-		# 2 - Till regroup (failure during regrouping; regroup strategy is known)
-		# 3 - Till reachability analysis (model cannot be solved, but statespace definition is made)
-		# 4 - Model is succesfully analyzed
-		info_reachability=0
-	
 		# TYPE (STATISTICS OR PERFORMANCE)
+		
 		type="?"
 		basename $file | grep "^0__$LTSMIN_BIN" > /dev/null
 		if [ $? -eq 0 ]; then
 			type="\"statistics\","
-			has_sylvanstat=true
 		else
 			type="\"performance\"," # May falsely mark files as PERFORMANCE if CHECK_NATURE_FLAG is false 
-			has_sylvanstat=false
 		fi
 		>>"$OUTPUT_FILE" echo -n "$type"
 		
-		# Determine status
+		# STATUS and STATUS-SPEC
+		
 		has_found_status=false
 		status="?"
 		status_spec="?"
@@ -104,21 +117,18 @@ for file in $(find "$INPUT_DIR" -type f); do
 		if [ $? -eq 0 ]; then 
 			status="\"done\","
 			status_spec="\"\","
-			info_reachability=4
 			has_found_status=true
 		fi
 		# Check Killed[24]
 		if ! $has_found_status; then
 			grep "Killed \[24\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
-				status="\"ootime\","
+				status=$OOTIME_VALUE
 				grep "Regrouping took" "$file" > /dev/null
 				if [ $? -eq 0 ]; then
 					status_spec="\"explore\","
-					info_reachability=3
 				else
 					status_spec="\"regroup\","
-					info_reachability=2
 				fi
 				has_found_status=true
 				
@@ -129,28 +139,23 @@ for file in $(find "$INPUT_DIR" -type f); do
 		if ! $has_found_status; then
 			grep "Exit \[1\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
+				status=$OOMEM_VALUE
 				grep "cache: Unable to allocate memory!" "$file" > /dev/null # LEGACY?
 				if [ $? -eq 0 ]; then 
-					status="\"oomem\","
 					status_spec="\"cache\","
-					info_reachability=3
 					has_found_status=true
 				fi
-				if ! $has_found_status; then
+				if ! $has_found_status; then # Prevents chaining if else statements
 					grep "MDD Unique table full" "$file" > /dev/null
 					if [ $? -eq 0 ]; then 
-						status="\"oomem\","
 						status_spec="\"mddtable\","
-						info_reachability=3
 						has_found_status=true
 					fi
 				fi
-				if ! $has_found_status; then
+				if ! $has_found_status; then # Prevents chaining if else statements
 					grep "Unable to allocate memory: Cannot allocate memory!" "$file" > /dev/null
 					if [ $? -eq 0 ]; then 
-						status="\"oomem\","
 						status_spec="\"alloc\","
-						info_reachability=3
 						has_found_status=true
 					fi
 				fi
@@ -162,35 +167,31 @@ for file in $(find "$INPUT_DIR" -type f); do
 			if [ $? -eq 0 ]; then 
 				grep "\*\* error \*\*: Got invalid permutation from boost." "$file" > /dev/null
 				if [ $? -eq 0 ]; then 
-					status="\"error\","
+					status=$ERROR_VALUE
 					status_spec="\"boostperm\","
-					info_reachability=2
 					has_found_status=true
 				fi
-				if ! $has_found_status; then
+				if ! $has_found_status; then # Prevents chaining if else statements
 					grep "*\* error \*\*: missing place" "$file" > /dev/null
 					if [ $? -eq 0 ]; then 
-						status="\"error\","
+						status=$ERROR_VALUE
 						status_spec="\"badmodel\","
-						info_reachability=1
 						has_found_status=true
 					fi
 				fi
-				if ! $has_found_status; then
+				if ! $has_found_status; then # Prevents chaining if else statements
 					grep "*\* error \*\*: out of memory trying to get" "$file" > /dev/null
 					if [ $? -eq 0 ]; then 
-						status="\"oomem\","
+						status=$OOMEM_VALUE
 						status_spec="\"regroup\","
-						info_reachability=2
 						has_found_status=true
 					fi
 				fi
-				if ! $has_found_status; then
+				if ! $has_found_status; then # Prevents chaining if else statements
 					grep "Please send information on how to reproduce this problem to:" "$file" > /dev/null
 					if [ $? -eq 0 ]; then 
-						status="\"sigsegfault\","
-						status_spec="\"sendinfo\","
-						info_reachability=3
+						status=$ERROR_VALUE
+						status_spec="\"sigsegfault\","
 						has_found_status=true
 					fi
 				fi
@@ -200,53 +201,48 @@ for file in $(find "$INPUT_DIR" -type f); do
 		if ! $has_found_status; then
 			grep "Killed \[6\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
+				status=$ERROR_VALUE
 				grep "lddmc_makenode: Assertion" "$file" > /dev/null
 				if [ $? -eq 0 ]; then
-					status="\"runerror\","
 					status_spec="\"makenode\","
 					has_found_status=true
 				fi
 				if ! $has_found_status; then
 					grep "lddmc_relprod_WORK: Assertion" "$file" > /dev/null
-					if [ $? -eq 0 ]; then 
-						status="\"runerror\","
+					if [ $? -eq 0 ]; then
 						status_spec="\"relprodwork\","
 						has_found_status=true
 					fi
 				fi
 				if ! $has_found_status; then
 					grep "lddmc_union_WORK: Assertion" "$file" > /dev/null
-					if [ $? -eq 0 ]; then 
-						status="\"runerror\","
+					if [ $? -eq 0 ]; then
 						status_spec="\"unionwork\","
 						has_found_status=true
 					fi
 				fi
-				info_reachability=3
 			fi
 		fi
 		# Check Killed[9]
 		if ! $has_found_status; then
 			grep "Killed \[9\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
-				status="\"ootime\","
+				status=$OOTIME_VALUE
 				status_spec="\"killed9\","
 				has_found_status=true
-				info_reachability=3
 			fi
 		fi
 		# Check Killed[11]
 		if ! $has_found_status; then
 			grep "Killed \[11\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
-				status="\"sigsegfault\","
+				status=$ERROR_VALUE
 				grep "Please send information on how to reproduce this problem to:" "$file" > /dev/null
 				if [ $? -eq 0 ]; then
-					status_spec="\"sendinfo\","
-					info_reachability=2
+					status_spec="\"sigsegfault\","
+					has_found_status=true
 				else
 					status_spec="\"\","
-					info_reachability=3
 				fi
 				has_found_status=true
 			fi
@@ -255,10 +251,9 @@ for file in $(find "$INPUT_DIR" -type f); do
 		if ! $has_found_status; then
 			grep "Killed \[15\]" "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
-				status="\"ootime\","
+				status=$OOTIME_VALUE
 				status_spec="\"killed15\","
 				has_found_status=true
-				info_reachability=2
 			fi
 		fi
 		# No response; check last line
@@ -266,10 +261,9 @@ for file in $(find "$INPUT_DIR" -type f); do
 		if ! $has_found_status; then
 			tail -n1 "$file" | grep "Regroup Boost's Sloan\|: bandwidth:\|: profile:\|: span:\|: average wavefront:\|: RMS wavefront:\|: Regrouping:" > /dev/null
 			if [ $? -eq 0 ]; then 
-				status="\"ootime\","
-				status_spec="\"noresponse\","
+				status=$OOTIME_VALUE
+				status_spec="\"regroup\","
 				has_memstats=false
-				info_reachability=2
 				has_found_status=true
 			fi
 		fi
@@ -277,122 +271,103 @@ for file in $(find "$INPUT_DIR" -type f); do
 		if ! $has_found_status; then
 			tail -n1 "$file" | grep "Creating a multi-core ListDD domain.\|Using GBgetTransitionsShortR2W as next-state function\|got initial state\|vrel_add_act not supported; falling back to vrel_add_cpy" > /dev/null
 			if [ $? -eq 0 ]; then 
-				status="\"ootime\","
-				status_spec="\"noresponse\","
+				status=$OOTIME_VALUE
+				status_spec="\"explore\","
 				has_memstats=false
-				info_reachability=3
 				has_found_status=true
 			fi
 		fi
 		# Last resort: use dummy value
 		if ! $has_found_status; then
 			>&2 echo "$file: could not determine a status." # Notify user
-			status="\"unknown\","
-			status_spec="\"\","
+			status=$UNKNOWN_VALUE
+			status_spec=$UNKNOWN_VALUE
 		fi
 		>>"$OUTPUT_FILE" echo -n "$status$status_spec"
 		
-		# INFO REACHABILITY >= 1
+		# ORDER
 		
-		awk '{
-			# ORDER
-			if ($3" "$4" "$5 == "Exploration order is") printf "\"%s\",", $6
-			# SATURATION
-			else if ($3" "$4" "$5 == "Saturation strategy is") printf "\"%s\",", $6
-    	}' "$file" >>"$OUTPUT_FILE"
-		
-		# Fixed values during testing which CANNOT be extracted from the outputfiles
-		>>"$OUTPUT_FILE" echo -n "$FIXED_VALUES"
-		
-		awk '{
-			# FILENAME
-			if ($3 == "opening") { "basename "$4 | getline name ; printf "\"%s\",", name }
-			# PETRI NET (PLACES, TRANSITIONS, ARCS)
-			else if ($3" "$4" "$5 == "Petri net has" && $7 == "places," && $9 == "transitions" && $12 == "arcs") printf "\"%s\",\"%s\",\"%s\",", $6, $8, $11
-    	}' "$file" >>"$OUTPUT_FILE"
-		
-		# INFO REACHABILITY >= 2
-		
-		# Extract if regroup is used from file name
-		# echo "$file" | grep "\-\-r" > /dev/null
-		# has_regroup=true `[ "$?" -eq 0 ]` 
-		
-		if [ $info_reachability -ge 2 ]; then
+		grep ": Exploration order is " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
 			awk '{
-				# PETRI NET (SAFE PLACES)
-				if ($3" "$4 == "There are" && $6" "$7 == "safe places") printf "\"%s\",", $5
+				if ($3" "$4" "$5 == "Exploration order is") printf "\"%s\",", $6
     		}' "$file" >>"$OUTPUT_FILE"
-			# REGROUP STRATEGY
-			if $has_regroup; then
-				awk '{
-					if ($3" "$4 == "Regroup specification:") printf "\"%s\",", $5
-				}' "$file" >>"$OUTPUT_FILE"
-			else
-				>>"$OUTPUT_FILE" echo -n "\"none\","
-			fi
 		else
-			# Pad missing info
-			padvalue "$OUTPUT_FILE" 2
+			>>"$OUTPUT_FILE" echo -n "$UNKNOWN_VALUE"
 		fi
 		
-		# INFO REACHABILITY >= 3
+		# SATURATION
 		
-		if [ $info_reachability -ge 3 ]; then
-			# REGROUP TIME
-			if $has_regroup; then
+		grep ": Saturation strategy is " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			awk '{
+				if ($3" "$4" "$5 == "Saturation strategy is") printf "\"%s\",", $6
+    		}' "$file" >>"$OUTPUT_FILE"
+		else
+			>>"$OUTPUT_FILE" echo -n "$UNKNOWN_VALUE"
+		fi
+		
+		# SAT-GRANULARITY
+		
+		# ???
+		
+		# FIXED VALUES
+		
+		if [ ADD_FIXED_PROP ]; then
+			>>"$OUTPUT_FILE" echo -n "$FIXED_VALUES"
+		fi
+		
+		# FILENAME and FILETYPE
+		
+		grep ": opening " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			filename=$(awk '{ if ($3 == "opening") { "basename "$4 | getline name ; printf "\"%s\",", name } }' "$file")
+			# 'Magic' snatched from http://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
+			model="${filename%.*}"
+			extension="${filename##*.}"
+			>>"$OUTPUT_FILE" echo -n "\"$model\",\"$extension\","
+		else
+			# No file found
+			>>"$OUTPUT_FILE" echo -n "$UNKNOWN_VALUE"
+			padvalue "$OUTPUT_FILE"
+		fi
+		
+		# REGROUP-STRATEGY
+		
+		has_regroup=false
+		grep ": Regroup specification: " "$file" > /dev/null
+		if [ $? -eq 0 ]; then 
+			awk '{
+				if ($3" "$4 == "Regroup specification:") printf "\"%s\",", $5
+			}' "$file" >>"$OUTPUT_FILE"
+			has_regroup=true
+		else
+			# No regroup strategy
+			padvalue "$OUTPUT_FILE"
+		fi
+		
+		# REGROUP TIME
+		
+		if $has_regroup; then
+			grep ": Regrouping took " "$file" > /dev/null
+			if [ $? -eq 0 ]; then 
 				awk '{
 					if ($3" "$4 == "Regrouping took") printf "\"%s\",", $7
 				}' "$file" >>"$OUTPUT_FILE"
 			else
-				# Regroup time cannot exist
+				# No regroup time
 				padvalue "$OUTPUT_FILE"
 			fi
-			awk '{
-				# STATE VECTOR LENGTH and GROUPS
-				if ($3" "$4" "$5" "$6 == "state vector length is") printf "\"%s\",\"%s\",", substr($7, 1, length($7)-1), $10
-			}' "$file" >>"$OUTPUT_FILE"
 		else
-			# Pad missing info
-			padvalue "$OUTPUT_FILE" 3
+			# Regroup time cannot exist
+			padvalue "$OUTPUT_FILE"
 		fi
-		
-		# INFO REACHABILITY >= 4
-		
-		if [ $info_reachability -ge 4 ]; then
-			awk '{
-				# GROUP CHECKS and NEXT STATE CALLS
-				if ($3" "$4 == "Exploration took") printf "\"%s\",\"%s\",", $5, $9
-				# REACHABILITY TIME
-				else if ($3" "$4 == "reachability took") printf "\"%s\",", $7
-				# STATESPACE STATES and NODES
-				else if ($3" "$4" "$5 == "state space has") printf "\"%s\",\"%s\",", $6, $8
-				# GROUP NEXT
-				else if ($3 == "group_next:") printf "\"%s\",", $4
-				# GROUP EXPLORED NODES and VECTORS
-				else if ($3 == "group_explored:") printf "\"%s\",\"%s\",", $4, $6
-				# MAX TOKEN COUNT
-				else if ($3" "$4" "$5 == "max token count:") printf "\"%s\",", $6
-	    	}' "$file" >>"$OUTPUT_FILE"
-		else
-			padvalue "$OUTPUT_FILE" 9
-		fi
-		
-		# MEMTIME STATISTICS
-		
-		if $has_memstats; then
-			awk '{
-				# RUNTIME and MEMORY FOOTPRINT
-				if ($2 == "user," && $4 == "system," && $6 == "elapsed") printf "\"%s\",\"%s\",", $1, substr($15, 1, length($15) - 2)
-	    	}' "$file" >>"$OUTPUT_FILE"
-		else
-			padvalue "$OUTPUT_FILE" 2
-		fi
-		
+			
 		# REGROUP STATISTICS
 		
 		basename $file | grep "\-\-graph\-metrics" > /dev/null
 		if [ $? -eq 0 ]; then
-			# Regroup stats may be present
+			# Regroup stats may be present; not guaranteed if run stopped responding
 			# BANDWIDTH
 			grep ": bandwidth: " "$file" > /dev/null
 			if [ $? -eq 0 ]; then 
@@ -443,12 +418,53 @@ for file in $(find "$INPUT_DIR" -type f); do
 			padvalue "$OUTPUT_FILE" 5
 		fi
 		
+		
+		if [ $info_reachability -ge 3 ]; then
+			awk '{
+				# STATE VECTOR LENGTH and GROUPS
+				if ($3" "$4" "$5" "$6 == "state vector length is") printf "\"%s\",\"%s\",", substr($7, 1, length($7)-1), $10
+			}' "$file" >>"$OUTPUT_FILE"
+		else
+			# Pad missing info
+			padvalue "$OUTPUT_FILE" 3
+		fi
+		
+		if [ $info_reachability -ge 4 ]; then
+			awk '{
+				# GROUP CHECKS and NEXT STATE CALLS
+				if ($3" "$4 == "Exploration took") printf "\"%s\",\"%s\",", $5, $9
+				# REACHABILITY TIME
+				else if ($3" "$4 == "reachability took") printf "\"%s\",", $7
+				# STATESPACE STATES and NODES
+				else if ($3" "$4" "$5 == "state space has") printf "\"%s\",\"%s\",", $6, $8
+				# GROUP NEXT
+				else if ($3 == "group_next:") printf "\"%s\",", $4
+				# GROUP EXPLORED NODES and VECTORS
+				else if ($3 == "group_explored:") printf "\"%s\",\"%s\",", $4, $6
+				# MAX TOKEN COUNT
+				else if ($3" "$4" "$5 == "max token count:") printf "\"%s\",", $6
+	    	}' "$file" >>"$OUTPUT_FILE"
+		else
+			padvalue "$OUTPUT_FILE" 9
+		fi
+		
+		# MEMTIME STATISTICS
+		
+		if $has_memstats; then
+			awk '{
+				# RUNTIME and MEMORY FOOTPRINT
+				if ($2 == "user," && $4 == "system," && $6 == "elapsed") printf "\"%s\",\"%s\",", $1, substr($15, 1, length($15) - 2)
+	    	}' "$file" >>"$OUTPUT_FILE"
+		else
+			padvalue "$OUTPUT_FILE" 2
+		fi
+		
 		# SYLVAN STATISTICS
 		
 		if $has_sylvanstats && [ $info_reachability -ge 4 ]; then
 			awk '{
 				# PEAKNODES
-				if ($5" "$6" "$7 == "final BDD nodes;") printf "\"%s\",", $8
+				if ($5" "$6" "$7 == "final BDD nodes;" && $9" "$10" "$11 == "peak nodes )") printf "\"%s\",", $8
 				# BDD OPERATIONS (rel prod, sat count, sat count l, rel prod union, project minus)
 				else if ($1 == "RelProd:") printf "\"%s\",",  $2
 				else if ($1 == "SatCount:") printf "\"%s\",",  $2
