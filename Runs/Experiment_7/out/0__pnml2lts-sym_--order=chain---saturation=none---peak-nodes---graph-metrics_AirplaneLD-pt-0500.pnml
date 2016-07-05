@@ -1,0 +1,61 @@
+pnml2lts-sym, 0.000: Exploration order is chain
+pnml2lts-sym, 0.000: Saturation strategy is none
+pnml2lts-sym, 0.000: Guided search strategy is unguided
+pnml2lts-sym, 0.000: Attractor strategy is default
+pnml2lts-sym, 0.000: opening /home/s1083392/experiments/in/pt2016/AirplaneLD-pt-0500.pnml
+pnml2lts-sym, 1.357: Petri net has 3519 places, 4008 transitions and 15278 arcs
+pnml2lts-sym, 1.357: There are 0 safe places
+pnml2lts-sym, 2.289: Petri net /home/s1083392/experiments/in/pt2016/AirplaneLD-pt-0500.pnml analyzed
+pnml2lts-sym, 2.734: Loading Petri net took 2.730 real 0.280 user 0.030 sys
+pnml2lts-sym, 2.734: Initializing regrouping layer
+pnml2lts-sym, 2.767: Regroup specification: tg,bs,hf
+pnml2lts-sym, 2.767: Regroup Total graph
+pnml2lts-sym, 2.767: Regroup Boost's Sloan
+pnml2lts-sym, 34.036: bandwidth: 20719
+pnml2lts-sym, 34.068: profile: 90077778
+pnml2lts-sym, 34.292: span: 93041158
+pnml2lts-sym, 279.381: average wavefront: 222.86592
+pnml2lts-sym, 523.915: RMS wavefront: 360.658969
+pnml2lts-sym, 524.290: Reqroup Horizontal Flip
+pnml2lts-sym, 524.321: Regrouping: 4008->4008 groups
+pnml2lts-sym, 528.216: Regrouping took 525.490 real 65.150 user 0.020 sys
+pnml2lts-sym, 528.216: state vector length is 3519; there are 4008 groups
+pnml2lts-sym, 528.216: Creating a multi-core ListDD domain.
+pnml2lts-sym, 528.584: Using GBgetTransitionsShortR2W as next-state function
+pnml2lts-sym, 606.736: got initial state
+pnml2lts-sym, 606.736: level 0 is finished
+pnml2lts-sym, 611.011: vrel_add_act not supported; falling back to vrel_add_cpy
+pnml2lts-sym, 675.908: level 1 is finished
+pnml2lts-sym, 891.081: level 2 is finished
+pnml2lts-sym, 1081.615: level 3 is finished
+pnml2lts-sym, 1147.781: Exploration took 16032 group checks and 16032 next state calls
+pnml2lts-sym, 1147.781: reachability took 541.040 real 66.780 user 1.160 sys
+pnml2lts-sym, 1147.781: counting visited states...
+pnml2lts-sym, 1147.782: counting took 0.000 real 0.000 user 0.000 sys
+pnml2lts-sym, 1147.782: state space has 4271787023 states, 19835 nodes
+pnml2lts-sym, 1147.782: ( 19835 final BDD nodes; 19835 peak nodes )
+pnml2lts-sym, 1147.783: group_next: 26548 nodes total
+pnml2lts-sym, 1147.783: group_explored: 34307 nodes, 18529 short vectors total
+*** Sylvan stats ***
+LDD operations count (cache reuse, cache put)
+Union: 30676270 (5919727, 24756543)
+RelProd: 75219077 (14139186, 61079891)
+SatCount: 49087 (11335, 37752)
+SatCountL: 4050 (4006, 44)
+ProjectMinus: 87284470 (17927294, 69357176)
+LDD Nodes created: 29440093
+LDD Nodes reused: 75123290
+
+Garbage collection
+Number of GC executions: 0
+Total time spent: 0.000000 sec.
+
+Tables
+Unique nodes table: 29440095 of 67108864 buckets filled.
+Operation cache: 58355502 of 67108864 buckets filled.
+
+Unique table
+Number of lookup iterations: 668845711
+pnml2lts-sym, 1149.019: max token count: 1
+Exit [0]
+141.95 user, 1.51 system, 1149.08 elapsed -- Max VSize = 6711328KB, Max RSS = 3441496KB
