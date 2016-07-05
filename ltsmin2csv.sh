@@ -317,7 +317,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 				sat="${sat##*=}"
 				>>"$OUTPUT_FILE" echo -n "\"$sat\","
 			else
-				>>"$OUTPUT_FILE" echo -n "$UNKNOWN_VALUE"
+				>>"$OUTPUT_FILE" echo -n "$EMPTY_VALUE"
 			fi
 		else
 			# Use given fixed value for sat-granularity

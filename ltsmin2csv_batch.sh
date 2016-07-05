@@ -22,21 +22,21 @@ function parse() {
 date '+"%T"'
 echo 'Start processing batches...'
 # Batches
-parse 'Runs/Experiment_3/5-11-1125' 'pnml2lts-sym' 'result-p1' 1
-parse 'Runs/Experiment_3/5-12-1045' 'pnml2lts-sym' 'result-p5' 5
-parse 'Runs/Experiment_3/5-17-1505' 'pnml2lts-sym' 'result-p10' 10
-parse 'Runs/Experiment_3/5-18-1345' 'pnml2lts-sym' 'result-p20' 20
-parse 'Runs/Experiment_3/5-19-1245' 'pnml2lts-sym' 'result-p40' 40
-parse 'Runs/Experiment_3/5-23-1235' 'pnml2lts-sym' 'result-p80' 80
-parse 'Runs/Experiment_3/5-24-1030' 'pnml2lts-sym' 'result-pmax' 'max-int'
+#parse 'Runs/Experiment_3/5-11-1125' 'pnml2lts-sym' 'result-p1' 1
+#parse 'Runs/Experiment_3/5-12-1045' 'pnml2lts-sym' 'result-p5' 5
+#parse 'Runs/Experiment_3/5-17-1505' 'pnml2lts-sym' 'result-p10' 10
+#parse 'Runs/Experiment_3/5-18-1345' 'pnml2lts-sym' 'result-p20' 20
+#parse 'Runs/Experiment_3/5-19-1245' 'pnml2lts-sym' 'result-p40' 40
+#parse 'Runs/Experiment_3/5-23-1235' 'pnml2lts-sym' 'result-p80' 80
+#parse 'Runs/Experiment_3/5-24-1030' 'pnml2lts-sym' 'result-pmax' 'max-int'
 
-parse 'Runs/Experiment_3/6-07-1030' 'dve2lts-sym' 'result-d1' 1
-parse 'Runs/Experiment_3/6-07-1640' 'dve2lts-sym' 'result-d5' 5
-parse 'Runs/Experiment_3/6-08-1240' 'dve2lts-sym' 'result-d10' 10
-parse 'Runs/Experiment_3/6-09-1140' 'dve2lts-sym' 'result-d20' 20
-parse 'Runs/Experiment_3/6-09-1600' 'dve2lts-sym' 'result-d40' 40
-parse 'Runs/Experiment_3/6-13-1220' 'dve2lts-sym' 'result-d80' 80
-parse 'Runs/Experiment_3/6-13-1650' 'dve2lts-sym' 'result-dmax' 'max-int'
+#parse 'Runs/Experiment_3/6-07-1030' 'dve2lts-sym' 'result-d1' 1
+#parse 'Runs/Experiment_3/6-07-1640' 'dve2lts-sym' 'result-d5' 5
+#parse 'Runs/Experiment_3/6-08-1240' 'dve2lts-sym' 'result-d10' 10
+#parse 'Runs/Experiment_3/6-09-1140' 'dve2lts-sym' 'result-d20' 20
+#parse 'Runs/Experiment_3/6-09-1600' 'dve2lts-sym' 'result-d40' 40
+#parse 'Runs/Experiment_3/6-13-1220' 'dve2lts-sym' 'result-d80' 80
+#parse 'Runs/Experiment_3/6-13-1650' 'dve2lts-sym' 'result-dmax' 'max-int'
 
 parse 'Runs/Experiment_4/5-25-1030' 'pnml2lts-sym' 'result-p1' 1
 parse 'Runs/Experiment_4/5-26-1325' 'pnml2lts-sym' 'result-p5' 5
