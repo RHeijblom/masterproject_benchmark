@@ -195,6 +195,14 @@ for file in $(find "$INPUT_DIR" -type f); do
 						has_found_status=true
 					fi
 				fi
+				if ! $has_found_status; then # Prevents chaining if else statements
+					grep "\*\* error \*\*: Make sure the initial marking \"[[:digit:]]*\" fits in a signed 32-bit integer" "$file" > /dev/null
+					if [ $? -eq 0 ]; then 
+						status=$ERROR_VALUE
+						status_spec="\"intval\","
+						has_found_status=true
+					fi
+				fi
 			fi
 		fi
 		# Check Killed[6]
@@ -218,6 +226,13 @@ for file in $(find "$INPUT_DIR" -type f); do
 					grep "lddmc_union_WORK: Assertion" "$file" > /dev/null
 					if [ $? -eq 0 ]; then
 						status_spec="\"unionwork\","
+						has_found_status=true
+					fi
+				fi
+				if ! $has_found_status; then
+					grep "lddmc_zip_WORK: Assertion" "$file" > /dev/null
+					if [ $? -eq 0 ]; then
+						status_spec="\"zipwork\","
 						has_found_status=true
 					fi
 				fi
@@ -259,7 +274,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 		# No response; check last line
 		# Check last line during regrouping
 		if ! $has_found_status; then
-			tail -n1 "$file" | grep "Regroup Boost's Sloan\|: bandwidth:\|: profile:\|: span:\|: average wavefront:\|: RMS wavefront:\|: Regrouping:" > /dev/null
+			tail -n1 "$file" | grep ": Regroup Boost's Sloan\|: Reqroup Horizontal Flip\|: bandwidth:\|: profile:\|: span:\|: average wavefront:\|: RMS wavefront:\|: Regrouping:" > /dev/null
 			if [ $? -eq 0 ]; then 
 				status=$OOTIME_VALUE
 				status_spec="\"regroup\","
@@ -269,10 +284,20 @@ for file in $(find "$INPUT_DIR" -type f); do
 		fi
 		# Check last line during initialisation of symbolic backend
 		if ! $has_found_status; then
-			tail -n1 "$file" | grep "Creating a multi-core ListDD domain.\|Using GBgetTransitionsShortR2W as next-state function\|got initial state\|vrel_add_act not supported; falling back to vrel_add_cpy" > /dev/null
+			tail -n1 "$file" | grep ": Creating a multi-core ListDD domain.\|: Using GBgetTransitionsShortR2W as next-state function\|: got initial state\|: vrel_add_act not supported; falling back to vrel_add_cpy\|: counting visited states...\|: state space has \|: level [[:digit:]]* is finished" > /dev/null
 			if [ $? -eq 0 ]; then 
 				status=$OOTIME_VALUE
 				status_spec="\"explore\","
+				has_memstats=false
+				has_found_status=true
+			fi
+		fi
+		# Check last line during printing statistics
+		if ! $has_found_status; then
+			tail -n1 "$file" | grep "Unique nodes table: [[:digit:]]* of [[:digit:]]* buckets filled." > /dev/null
+			if [ $? -eq 0 ]; then 
+				status=$OOTIME_VALUE
+				status_spec="\"stats\","
 				has_memstats=false
 				has_found_status=true
 			fi
