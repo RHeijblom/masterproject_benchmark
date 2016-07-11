@@ -127,11 +127,11 @@ for file in $(find "$INPUT_DIR" -type f); do
 				grep "Regrouping took" "$file" > /dev/null
 				if [ $? -eq 0 ]; then
 					status_spec="\"explore\","
+					has_found_status=true
 				else
 					status_spec="\"regroup\","
 				fi
-				has_found_status=true
-				
+				#has_found_status=true
 			fi
 		fi
 		# Uncommon cases
@@ -143,7 +143,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 				grep "cache: Unable to allocate memory!" "$file" > /dev/null # LEGACY?
 				if [ $? -eq 0 ]; then 
 					status_spec="\"cache\","
-					has_found_status=true
+					#has_found_status=true
 				fi
 				if ! $has_found_status; then # Prevents chaining if else statements
 					grep "MDD Unique table full" "$file" > /dev/null
@@ -176,7 +176,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 					if [ $? -eq 0 ]; then 
 						status=$ERROR_VALUE
 						status_spec="\"badmodel\","
-						has_found_status=true
+						#has_found_status=true
 					fi
 				fi
 				if ! $has_found_status; then # Prevents chaining if else statements
@@ -219,13 +219,20 @@ for file in $(find "$INPUT_DIR" -type f); do
 					grep "lddmc_relprod_WORK: Assertion" "$file" > /dev/null
 					if [ $? -eq 0 ]; then
 						status_spec="\"relprodwork\","
-						has_found_status=true
+						#has_found_status=true
 					fi
 				fi
 				if ! $has_found_status; then
 					grep "lddmc_union_WORK: Assertion" "$file" > /dev/null
 					if [ $? -eq 0 ]; then
 						status_spec="\"unionwork\","
+						#has_found_status=true
+					fi
+				fi
+				if ! $has_found_status; then
+					grep "lddmc_minus_WORK: Assertion" "$file" > /dev/null
+					if [ $? -eq 0 ]; then
+						status_spec="\"minuswork\","
 						has_found_status=true
 					fi
 				fi
@@ -244,7 +251,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 			if [ $? -eq 0 ]; then 
 				status=$OOTIME_VALUE
 				status_spec="\"killed9\","
-				has_found_status=true
+				#has_found_status=true
 			fi
 		fi
 		# Check Killed[11]

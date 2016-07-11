@@ -47,17 +47,17 @@ echo 'Start processing batches...'
 #parse 'Runs/Experiment_4/6-03-1240' 'pnml2lts-sym' 'result-pmax' 2147483647	#DONE
 
 #parse 'Runs/Experiment_4/6-14-1025' 'dve2lts-sym' 'result-d1' 1				#DONE
-#parse 'Runs/Experiment_4/6-16-1325' 'dve2lts-sym' 'result-d5' 5				#DONE
-#parse 'Runs/Experiment_4/6-17-1135' 'dve2lts-sym' 'result-d10' 10				#DONE
-#parse 'Runs/Experiment_4/6-20-1035' 'dve2lts-sym' 'result-d20' 20				#DONE
-#parse 'Runs/Experiment_4/6-21-1240' 'dve2lts-sym' 'result-d40' 40				#DONE
-#parse 'Runs/Experiment_4/6-22-1050' 'dve2lts-sym' 'result-d80' 80				#DONE
-#parse 'Runs/Experiment_4/6-28-1150' 'dve2lts-sym' 'result-dmax' 2147483647		#DONE
+parse 'Runs/Experiment_4/6-16-1325' 'dve2lts-sym' 'result-d5' 5				#DONE
+parse 'Runs/Experiment_4/6-17-1135' 'dve2lts-sym' 'result-d10' 10				#DONE
+parse 'Runs/Experiment_4/6-20-1035' 'dve2lts-sym' 'result-d20' 20				#DONE
+parse 'Runs/Experiment_4/6-21-1240' 'dve2lts-sym' 'result-d40' 40				#DONE
+parse 'Runs/Experiment_4/6-22-1050' 'dve2lts-sym' 'result-d80' 80				#DONE
+parse 'Runs/Experiment_4/6-28-1150' 'dve2lts-sym' 'result-dmax' 2147483647		#DONE
 
 #parse 'Runs/Experiment_5/6-04-1235' 'pnml2lts-sym' 'result-pnone'				#DONE
-#parse 'Runs/Experiment_5/6-29-1105' 'dve2lts-sym' 'result-dnone'				#DONE
+parse 'Runs/Experiment_5/6-29-1105' 'dve2lts-sym' 'result-dnone'				#DONE
 
-parse 'Runs/Experiment_7' 'pnml2lts-sym' 'result-pmix'
+#parse 'Runs/Experiment_7' 'pnml2lts-sym' 'result-pmix'
 
 echo ""
 date '+"%T"'
