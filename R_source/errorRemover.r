@@ -15,13 +15,14 @@ print("Data read...")
 print(paste("Different models before:",nrow(ddply(.parallel=TRUE, inputData, "filename", summarize, freq = length(filename)))))
 
 # 1st filter: remove all models were all results are wrong.
-allCorrupt <- c("afcs_05_b","afcs_06_b"
+allCorrupt <- c("afcs_04_b","afcs_05_b","afcs_06_b"
 			   ,"CircularTrain-384","CircularTrain-768"
 			   ,"database10UNFOLD","database20UNFOLD","database40UNFOLD"
 			   ,"des_00_b","des_01_b","des_02_b","des_05_a","des_05_b"
 			   ,"des_10_a","des_10_b","des_20_a","des_20_b","des_30_a","des_30_b","des_40_a","des_40_b","des_50_a","des_50_b","des_60_a","des_60_b"
 			   ,"echo-d2r9","echo-d2r11","echo-d2r15","echo-d2r19","echo-d3r3","echo-d3r5","echo-d3r7","echo-d4r3","echo-d5r3"
 			   ,"G-PPP-1-10000","G-PPP-1-100000"
+			   ,"IOTP_c12m10p15d17"
 			   ,"QCertifProtocol_10-unfold","QCertifProtocol_18-unfold","QCertifProtocol_22-unfold","QCertifProtocol_28-unfold","QCertifProtocol_32-unfold"
 			   ,"rwmutex-r100w10","rwmutex-r500w10","rwmutex-r1000w10","rwmutex-r2000w10"
 			   ,"sokoban.3"
@@ -62,10 +63,10 @@ print("Minor conflicting entries removed...")
 print(paste("Entries remaining after: ", nrow(inputData)))
 
 # Optional 4th filter: only keep done entries:
-#print(paste("Entries remaining before:", nrow(inputData)))
-#inputData <- subset(inputData, status == "done")
-#print("Non finished entries removed...")
-#print(paste("Entries remaining after: ", nrow(inputData)))
+print(paste("Entries remaining before:", nrow(inputData)))
+inputData <- subset(inputData, status == "done")
+print("Non finished entries removed...")
+print(paste("Entries remaining after: ", nrow(inputData)))
 
 outputData <- inputData
 # Prevent that large numbers are converted to Inf
