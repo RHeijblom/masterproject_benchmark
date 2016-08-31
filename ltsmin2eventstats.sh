@@ -57,7 +57,7 @@ function padvalue() {
 # START CSV FILE CREATION
 
 # Print csv header
->"$OUTPUT_FILE" echo '"filename","filetype","event-span","event-span-norm","weigthed-event-span","weighted-event-span-norm",'
+>"$OUTPUT_FILE" echo '"filename","filetype","event-span","event-span-norm","weighted-event-span","weighted-event-span-norm",'
 
 # Analyse all files
 for file in $(find "$INPUT_DIR" -type f); do
