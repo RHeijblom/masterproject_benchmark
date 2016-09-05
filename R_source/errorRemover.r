@@ -12,9 +12,10 @@ args <- commandArgs(trailingOnly = TRUE)
 inputData <- read.csv(file=args[1], sep=',', quote="\"")
 print("Data read...")
 
+# 1st filter: remove all models were all results are wrong.
+
 print(paste("Different models before:",nrow(ddply(.parallel=TRUE, inputData, "filename", summarize, freq = length(filename)))))
 
-# 1st filter: remove all models were all results are wrong.
 allCorrupt <- c("afcs_04_b","afcs_05_b","afcs_06_b"
 			   ,"CircularTrain-384","CircularTrain-768"
 			   ,"database10UNFOLD","database20UNFOLD","database40UNFOLD"
@@ -35,18 +36,42 @@ for(cmodel in allCorrupt){
 
 print("Corrupt models removed...")
 print(paste("Different models after: ",nrow(ddply(.parallel=TRUE, inputData, "filename", summarize, freq = length(filename)))))
+print("----------------------------------------------------------------------------------")
+
+# 2nd filter: remove all models were statespace is too small
 
 print(paste("Entries remaining before:", nrow(inputData)))
 
-# 2nd filter: remove all models were statespace is too small
 inputData <- subset(inputData, is.na(statespace.states) | statespace.states >= 8)
 print("Small statespaces removed...")
 
 print(paste("Entries remaining after: ", nrow(inputData)))
+print("----------------------------------------------------------------------------------")
 
+# Optional 3rd filter: remove all models which cannot be solved
+
+print(paste("Different models before:",nrow(ddply(.parallel=TRUE, inputData, "filename", summarize, freq = length(filename)))))
 print(paste("Entries remaining before:", nrow(inputData)))
 
-# 3rd filter: select best entry from multiple conflicting entries using voting
+nCols <- ncol(inputData)
+# Defines which testrun were solved
+inputData$isSolved <- inputData$status == "done"
+# Defines which models can be solved
+solvedData <- ddply(.parallel=TRUE, inputData, "filename", summarize, isSolvable = any(isSolved))
+# Remove unsolvable models
+inputData <- merge(inputData, solvedData, "filename");
+inputData <- subset(inputData, isSolvable)
+# Remove temporary data (isSolved and isSolvable)
+inputData <- inputData[,1:nCols]
+
+print("Unsolvable models removed...")
+print(paste("Different models after: ",nrow(ddply(.parallel=TRUE, inputData, "filename", summarize, freq = length(filename)))))
+print(paste("Entries remaining after: ", nrow(inputData)))
+print("----------------------------------------------------------------------------------")
+
+# 4th filter: select best entry from multiple conflicting entries using voting
+
+print(paste("Entries remaining before:", nrow(inputData)))
 
 nCols <- ncol(inputData)
 voteData <- ddply(.parallel=TRUE, inputData, c("filename","statespace.states"), summarize, vote = length(filename))
@@ -61,12 +86,17 @@ inputData <- inputData[,1:nCols]
 					
 print("Minor conflicting entries removed...")
 print(paste("Entries remaining after: ", nrow(inputData)))
+print("----------------------------------------------------------------------------------")
 
-# Optional 4th filter: only keep done entries:
-print(paste("Entries remaining before:", nrow(inputData)))
-inputData <- subset(inputData, status == "done")
-print("Non finished entries removed...")
-print(paste("Entries remaining after: ", nrow(inputData)))
+# Optional 5th filter: only keep done entries:
+
+#print(paste("Entries remaining before:", nrow(inputData)))
+#inputData <- subset(inputData, status == "done")
+#print("Non finished entries removed...")
+#print(paste("Entries remaining after: ", nrow(inputData)))
+#print("----------------------------------------------------------------------------------")
+
+# Write output to file
 
 outputData <- inputData
 # Prevent that large numbers are converted to Inf
@@ -75,4 +105,5 @@ outputData$statespace.states <- as.character(outputData$statespace.states)
 outputData <- outputData[order(outputData$filename),]
 # Write compressed data
 write.table(outputData, file=args[2], sep=',', quote=TRUE ,row.names=FALSE,na="")
+print("Data succesfully saved...")
 
