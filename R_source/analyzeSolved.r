@@ -1,7 +1,9 @@
 #!/usr/bin/Rscript
 .libPaths("/home/richard/Tools/R")
+library(ggplot2)
 library(plyr)
 library(reshape2)
+library(scales)
 library(doMC)
 
 # Make sure we use all available CPUs
@@ -32,6 +34,41 @@ print("Number of solved models per testcase:")
 print(allTestcases)
 print("")
 
+# Create diagram grouped by saturation
+dfSat <- data.frame(saturation=c("sat-like","sat-loop","none"), satVal=c(10,20,30))
+allTestcases <- merge(allTestcases, dfSat, "saturation", all.x=TRUE)
+dfGran <- data.frame(sat.granularity=c(1,5,10,20,40,80,2147483647), granVal=1:7)
+allTestcases <- merge(allTestcases, dfGran, "sat.granularity", all.x=TRUE)
+allTestcases$satVal <- allTestcases$satVal + allTestcases$granVal
+allTestcases$satLabel <- ifelse(is.na(allTestcases$sat.granularity), paste0(allTestcases$saturation), paste0(allTestcases$saturation,"(",as.character(allTestcases$sat.granularity),")"))
+
+ggplot(allTestcases) + 
+	# Data
+	geom_bar(aes(x=reorder(satLabel, -satVal), y=total, fill=order), stat="identity", position=position_dodge()) +
+	coord_flip() +
+	# Aes
+	labs(title=paste0("Capability of the selected strategies")) +
+	xlab("Saturation") +
+	ylab("Number of models")
+
+ggsave(paste0(args[2],"/Solved Strategy - Grouped.pdf"), height=9, width=6)
+
+# Create diagram sorted by total only
+dfOrderChar <- data.frame(order=c("bfs","bfs-prev","chain","chain-prev"), char=c("b","bp","c","cp"))
+allTestcases <- merge(allTestcases, dfOrderChar, "order", all.x=TRUE)
+allTestcases$satLabel <- ifelse(is.na(allTestcases$sat.granularity), paste0(allTestcases$saturation,"-",allTestcases$char), paste0(allTestcases$saturation,"(",as.character(allTestcases$sat.granularity),")-",allTestcases$char))
+
+ggplot(allTestcases) + 
+	# Data
+	geom_bar(aes(x=reorder(satLabel,total), y=total, fill=order), stat="identity", position=position_dodge()) +
+	coord_flip() +
+	# Aes
+	labs(title=paste0("Capability of the selected strategies")) +
+	xlab("Strategy") +
+	ylab("Number of models")
+
+ggsave(paste0(args[2],"/Solved Strategy - Seperate.pdf"), height=9, width=6)
+
 # Solved per ORDER
 # Abstract from saturation strategy
 orderData <- ddply(.parallel=TRUE, solvedData, c(order,model), summarize, dummy=TRUE)
@@ -47,6 +84,18 @@ allOrders$total <- ifelse(is.na(allOrders$total), 0, allOrders$total)
 print("Number of solved models per  order:")
 print(allOrders)
 print("")
+
+# Create diagram
+ggplot(allOrders) + 
+	# Data
+	geom_bar(aes(x=order, y=total, fill=order), stat="identity") +
+	# Aes
+	labs(title=paste0("Performance of exploration order with dynamic saturation")) +
+	xlab("Exploration order") +
+	ylab("Number of models solved") +
+	guides(fill=FALSE)
+
+ggsave(paste0(args[2],"/Solved Order.pdf"), height=4, width=7)
 
 # Solved per SATURATION STRATEGY
 # Abstract from order
