@@ -23,6 +23,8 @@ modelData <- read.csv(file=args[2], sep=',')
 
 allData <- merge(perfData, modelData, "filename")
 
+# INDIVIDUAL MARKS
+
 # Overview per group of models
 modelGroups <- unique(modelData$parent.name)
 for(m in 1:length(modelGroups)){
@@ -63,10 +65,13 @@ for(m in 1:length(modelGroups)){
 	}
 }
 
-# All marks
+# ALL MARKS
 
 # Abstract from model differences
 allData$param.name <- "All"
+
+print("Summary time mark:")
+print(summary(allData$timeMark))
 
 # Create boxplot for TIME
 ggplot(allData, aes(x=param.name, y=timeMark)) + 
@@ -82,20 +87,17 @@ ggplot(allData, aes(x=param.name, y=timeMark)) +
 
 ggsave(paste0(args[3],"/Model Performance - Time.pdf"), height=5, width=7)
 
-print(paste("Mean time mark:", mean(allData$timeMark)))
-
 # Create 2nd boxplot for TIME (limited to Mark = 50)
 ggplot(allData, aes(x=param.name, y=timeMark)) + 
 	# Data
 	geom_boxplot() +
-	geom_jitter(position=position_jitter(0.5), aes(color=order)) +
+	geom_jitter(position=position_jitter(0.5), aes(color=order), cex=1) +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
 	# Aes
 	labs(title=paste0("Performance on all models (Time)")) +
 	xlab("Model variant") +
 	ylab("Mark") +
-	coord_cartesian(ylim=c(0, 50)) +
-	coord_flip()
+	coord_flip(ylim=c(0, 50))
 
 ggsave(paste0(args[3],"/Model Performance - Time (zoom 1x).pdf"), height=5, width=7)
 
@@ -103,21 +105,21 @@ ggsave(paste0(args[3],"/Model Performance - Time (zoom 1x).pdf"), height=5, widt
 ggplot(allData, aes(x=param.name, y=timeMark)) + 
 	# Data
 	geom_boxplot() +
-	geom_jitter(position=position_jitter(0.5), aes(color=order)) +
+	geom_jitter(position=position_jitter(0.5), aes(color=order), cex=0.5) +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
 	# Aes
 	labs(title=paste0("Performance on all models (Time)")) +
 	xlab("Model variant") +
 	ylab("Mark") +
-	coord_cartesian(ylim=c(0, 10)) +
-	coord_flip()
+	coord_flip(ylim=c(0,10))
 
 ggsave(paste0(args[3],"/Model Performance - Time (zoom 2x) .pdf"), height=5, width=7)
 
 # Remove entries where a mark for peaksize does not exist
 allData <- subset(allData, !is.na(peak.nodes))
 
-print(paste("Mean peaksize mark:", mean(allData$timeMark)))
+print("Summary peaksize mark:")
+print(summary(allData$memMark))
 
 # Create boxplot for PEAKSIZE
 ggplot(allData, aes(x=param.name, y=memMark)) + 
@@ -132,3 +134,17 @@ ggplot(allData, aes(x=param.name, y=memMark)) +
 	ylab("Mark")
 
 ggsave(paste0(args[3],"/Model Performance - Peaksize.pdf"), height=5, width=7)
+
+# Create 2nd boxplot for PEAKSIZE (limited to Mark = 300)
+ggplot(allData, aes(x=param.name, y=memMark)) + 
+	# Data
+	geom_boxplot() +
+	geom_jitter(position=position_jitter(0.5), aes(color=order), cex=1) +
+	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
+	coord_flip(ylim=c(0,300)) +
+	# Aes
+	labs(title=paste0("Performance on all models (Peaksize)")) +
+	xlab("Model variant") +
+	ylab("Mark")
+
+ggsave(paste0(args[3],"/Model Performance - Peaksize (zoom 1x).pdf"), height=5, width=7)
