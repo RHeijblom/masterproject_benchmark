@@ -15,6 +15,7 @@ doMC::registerDoMC(cores=8)
 
 # Read file
 args <- commandArgs(trailingOnly = TRUE)
+source("./statUtils.r")
 perfData <- read.csv(file=args[1], sep=',', quote="\"")
 # Remove marks of unsolvable model and strategy pairs
 perfData <- subset(perfData, solvedCount > 0)
@@ -24,19 +25,18 @@ sat <- c("saturation","sat.granularity")
 model <- c("filename","filetype")
 
 # Add labels for graphs
-dfSat <- data.frame(saturation=c("sat-like","sat-loop","none"), satVal=c(10,20,30))
-perfData <- merge(perfData, dfSat, "saturation", all.x=TRUE)
-dfGran <- data.frame(sat.granularity=c(1,5,10,20,40,80,2147483647), granVal=1:7)
-perfData <- merge(perfData, dfGran, "sat.granularity", all.x=TRUE)
-perfData$satVal <- perfData$satVal + perfData$granVal
-perfData$satLabel <- ifelse(is.na(perfData$sat.granularity), paste0(perfData$saturation), paste0(perfData$saturation,"(",as.character(perfData$sat.granularity),")"))
-dfOrderChar <- data.frame(order=c("bfs","bfs-prev","chain","chain-prev"), char=c("b","bp","c","cp"))
-perfData <- merge(perfData, dfOrderChar, "order", all.x=TRUE)
-perfData$stratLabel <- paste0(perfData$satLabel,"-",perfData$char)
+perfData <- addGraphLabels(perfData)
 
 # TIME
 
+print("TIME")
+print("")
+
 # BOXPLOTS FOR TIME PERFORMANCE OF STRATEGIES (GROUPED BY SATURATION)
+
+print("Mark distribution for all strategies")
+print(summarizeDataByGroup(perfData, c(order,sat), "timeMark"))
+print("")
 
 # Create boxplot for TIME
 ggplot(perfData, aes(x=reorder(satLabel, -satVal), y=timeMark, fill=order)) + 
@@ -122,6 +122,10 @@ ordData <- ddply(.parallel=TRUE, perfData, c(model,order), summarize, timeMark =
 dfAvgMarks <- ddply(.parallel=TRUE, ordData, order, summarize, timeMarkAvg = mean(timeMark))
 ordData <- merge(ordData, dfAvgMarks, order)
 
+print("Mark distribution for all orders")
+print(summarizeDataByGroup(ordData, order, "timeMark"))
+print("")
+
 # Create boxplot for TIME
 ggplot(ordData, aes(x=reorder(order, timeMarkAvg), y=timeMark, fill=order)) + 
 	# Data
@@ -165,6 +169,10 @@ ggsave(paste0(args[2],"/Time/Performance Order (zoom 2x).pdf"), height=4, width=
 satData <- ddply(.parallel=TRUE, perfData, c(model,sat, "satLabel", "satVal"), summarize, timeMark = min(timeMark, na.rm=TRUE))
 dfAvgMarks <- ddply(.parallel=TRUE, satData, sat, summarize, timeMarkAvg = mean(timeMark))
 satData <- merge(satData, dfAvgMarks, sat)
+
+print("Mark distribution for all strategies")
+print(summarizeDataByGroup(satData, sat, "timeMark"))
+print("")
 
 # Create boxplot for TIME
 ggplot(satData, aes(x=reorder(satLabel, timeMarkAvg), y=timeMark, fill=saturation)) + 
@@ -225,8 +233,15 @@ ggsave(paste0(args[2],"/Time/Performance Saturation - Grouped (zoom 1x).pdf"), h
 
 # PEAKSIZE
 
+print("PEAKSIZE")
+print("")
+
 # BOXPLOTS FOR PEAKSIZE PERFORMANCE OF STRATEGIES (GROUPED BY SATURATION)
 perfData <- subset(perfData, !is.na(peak.nodes))
+
+print("Mark distribution for all strategies")
+print(summarizeDataByGroup(perfData, c(order,sat), "memMark"))
+print("")
 
 # Create boxplot for PEAKSIZE
 ggplot(perfData, aes(x=reorder(satLabel, -satVal), y=memMark, fill=order)) + 
@@ -312,6 +327,10 @@ ordData <- ddply(.parallel=TRUE, perfData, c(model,order), summarize, memMark = 
 dfAvgMarks <- ddply(.parallel=TRUE, ordData, order, summarize, memMarkAvg = mean(memMark))
 ordData <- merge(ordData, dfAvgMarks, order)
 
+print("Mark distribution for all strategies")
+print(summarizeDataByGroup(ordData, order, "memMark"))
+print("")
+
 # Create boxplot for PEAKSIZE
 ggplot(ordData, aes(x=reorder(order, memMarkAvg), y=memMark, fill=order)) + 
 	# Data
@@ -355,6 +374,10 @@ ggsave(paste0(args[2],"/Peaknodes/Performance Order (zoom 2x).pdf"), height=4, w
 satData <- ddply(.parallel=TRUE, perfData, c(model,sat, "satLabel", "satVal"), summarize, memMark = min(memMark, na.rm=TRUE))
 dfAvgMarks <- ddply(.parallel=TRUE, satData, sat, summarize, memMarkAvg = mean(memMark))
 satData <- merge(satData, dfAvgMarks, sat)
+
+print("Mark distribution for all strategies")
+print(summarizeDataByGroup(satData, sat, "memMark"))
+print("")
 
 # Create boxplot for PEAK
 ggplot(satData, aes(x=reorder(satLabel, memMarkAvg), y=memMark, fill=saturation)) + 
