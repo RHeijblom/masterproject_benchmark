@@ -547,7 +547,7 @@ for file in $(find "$INPUT_DIR" -type f); do
 		grep " final BDD nodes; " "$file" > /dev/null
 		if [ $? -eq 0 ]; then 
 			awk '{
-				if ($5" "$6" "$7 == "final BDD nodes;" && $9" "$10 == "peak nodes;") printf "\"%s\",", $8
+				if ($5" "$6" "$7 == "final BDD nodes;" && $9" "substr($10,1,5) == "peak nodes") printf "\"%s\",", $8
 			}' "$file" >>"$OUTPUT_FILE"
 		else
 			padvalue "$OUTPUT_FILE"
@@ -567,8 +567,9 @@ for file in $(find "$INPUT_DIR" -type f); do
 				padvalue "$OUTPUT_FILE"
 			fi
 			# MINUS
-			grep "Minus: " "$file" > /dev/null
-			if [ $? -eq 0 ]; then 
+			# Notice conflict with ProjectMinus:
+			MINUSCOUNT=$(grep "Minus: " "$file" | wc -l);
+			if [ $MINUSCOUNT -gt 1 ]; then 
 				awk '{
 					if ($1 == "Minus:") printf "\"%s\",",  $2
 				}' "$file" >>"$OUTPUT_FILE"
