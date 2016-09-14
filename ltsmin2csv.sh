@@ -219,14 +219,14 @@ for file in $(find "$INPUT_DIR" -type f); do
 					grep "lddmc_relprod_WORK: Assertion" "$file" > /dev/null
 					if [ $? -eq 0 ]; then
 						status_spec="\"relprodwork\","
-						#has_found_status=true
+						has_found_status=true
 					fi
 				fi
 				if ! $has_found_status; then
 					grep "lddmc_union_WORK: Assertion" "$file" > /dev/null
 					if [ $? -eq 0 ]; then
 						status_spec="\"unionwork\","
-						#has_found_status=true
+						has_found_status=true
 					fi
 				fi
 				if ! $has_found_status; then
