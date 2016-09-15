@@ -259,7 +259,7 @@ ggsave(paste0(args[2],"/Peaknodes/Performance Strategy - Grouped.pdf"), height=9
 ggplot(perfData, aes(x=reorder(satLabel, -satVal), y=memMark, fill=order)) + 
 	# Data
 	geom_boxplot() +
-	coord_flip(ylim=c(0,1000)) +
+	coord_flip(ylim=c(1,5)) +
 	# Aes
 	labs(title=paste0("Performance on all models (Peaksize)")) +
 	xlab("Strategy") +
@@ -271,7 +271,7 @@ ggsave(paste0(args[2],"/Peaknodes/Performance Strategy - Grouped (zoom 1x).pdf")
 ggplot(perfData, aes(x=reorder(satLabel, -satVal), y=memMark, fill=order)) + 
 	# Data
 	geom_boxplot() +
-	coord_flip(ylim=c(0,8)) +
+	coord_flip(ylim=c(1,2)) +
 	# Aes
 	labs(title=paste0("Performance on all models (Peaksize)")) +
 	xlab("Strategy") +
@@ -301,7 +301,7 @@ ggplot(perfData, aes(x=reorder(stratLabel, memMarkAvg), y=memMark, fill=order)) 
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(0,1200)) +
+	coord_flip(ylim=c(1,5)) +
 	# Aes
 	labs(title=paste0("Performance on all models (Peaksize)")) +
 	xlab("Strategy") +
@@ -314,7 +314,7 @@ ggplot(perfData, aes(x=reorder(stratLabel, memMarkAvg), y=memMark, fill=order)) 
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(0,5)) +
+	coord_flip(ylim=c(1,2)) +
 	# Aes
 	labs(title=paste0("Performance on all models (Peaksize)")) +
 	xlab("Strategy") +
@@ -349,7 +349,7 @@ ggplot(ordData, aes(x=reorder(order, memMarkAvg), y=memMark, fill=order)) +
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(0,600)) +
+	coord_flip(ylim=c(1,1.2)) +
 	# Aes
 	labs(title=paste0("Performance on all models (Peaksize)")) +
 	xlab("Exploration order") +
@@ -362,7 +362,7 @@ ggplot(ordData, aes(x=reorder(order, memMarkAvg), y=memMark, fill=order)) +
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(1,1.05)) +
+	coord_flip(ylim=c(1,1.02)) +
 	# Aes
 	labs(title=paste0("Performance on all models (Peaksize)")) +
 	xlab("Exploration order") +
@@ -398,7 +398,7 @@ ggplot(satData, aes(x=reorder(satLabel, memMarkAvg), y=memMark, fill=saturation)
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(0,250)) +
+	coord_flip(ylim=c(1,4)) +
 	# Aes
 	scale_fill_brewer(palette="Set2") +
 	labs(title=paste0("Performance on all models (Peaksize)")) +
@@ -412,7 +412,7 @@ ggplot(satData, aes(x=reorder(satLabel, memMarkAvg), y=memMark, fill=saturation)
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(1,4)) +
+	coord_flip(ylim=c(1,2)) +
 	# Aes
 	scale_fill_brewer(palette="Set2") +
 	labs(title=paste0("Performance on all models (Peaksize)")) +
@@ -441,7 +441,7 @@ ggplot(satData, aes(x=reorder(satLabel, -satVal), y=memMark, fill=saturation)) +
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(0,250)) +
+	coord_flip(ylim=c(1,4)) +
 	# Aes
 	scale_fill_brewer(palette="Set2") +
 	labs(title=paste0("Performance on all models (Peaksize)")) +
@@ -455,7 +455,7 @@ ggplot(satData, aes(x=reorder(satLabel, -satVal), y=memMark, fill=saturation)) +
 	# Data
 	geom_boxplot() +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(1,4)) +
+	coord_flip(ylim=c(1,2)) +
 	# Aes
 	scale_fill_brewer(palette="Set2") +
 	labs(title=paste0("Performance on all models (Peaksize)")) +

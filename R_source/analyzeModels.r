@@ -135,13 +135,13 @@ ggplot(allData, aes(x=param.name, y=memMark)) +
 
 ggsave(paste0(args[3],"/Model Performance - Peaksize.pdf"), height=5, width=7)
 
-# Create 2nd boxplot for PEAKSIZE (limited to Mark = 300)
+# Create 2nd boxplot for PEAKSIZE (limited to Mark = 5)
 ggplot(allData, aes(x=param.name, y=memMark)) + 
 	# Data
 	geom_boxplot() +
 	geom_jitter(position=position_jitter(0.5), aes(color=order), cex=1) +
 	stat_summary(fun.y=mean, geom="point", shape=18, size=5, color="gray33") +
-	coord_flip(ylim=c(0,300)) +
+	coord_flip(ylim=c(0,5)) +
 	# Aes
 	labs(title=paste0("Performance on all models (Peaksize)")) +
 	xlab("Model variant") +
