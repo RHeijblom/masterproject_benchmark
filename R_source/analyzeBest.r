@@ -14,9 +14,9 @@ doMC::registerDoMC(cores=8)
 # Argument 2 = Folder where the graphs are stored
 
 # Anything below markThreshold will be considered as 'best' strategy
-markThreshold <- 1.1
-header <- "Number of times selected as appropiate"
-outputFile <- "Appropiate"
+markThreshold <- 1
+header <- "Number of times selected as best"
+outputFile <- "Best"
 
 # Read file
 args <- commandArgs(trailingOnly = TRUE)

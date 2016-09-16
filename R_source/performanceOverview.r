@@ -18,17 +18,31 @@ inputData <- read.csv(file=args[1], sep=',', quote="\"")
 model <- c("filename","filetype")
 testCase <- c("order","saturation","sat.granularity")
 
+# Sat.granularity fix
+colCount <- ncol(inputData)
+# Identifier of max granularity
+MAXINT <- 2147483647 
+# Derive state_vector_length for models with at least one solved instance, otherwise set derivedSvl to NA.
+mapSvl <- ddply(.parallel=TRUE, inputData, model, summarize, derivedSvl = mean(state.vector.length, na.rm=TRUE))
+# Add derived state.vector.length to data
+inputData <- merge(inputData, mapSvl, model)
+# Fix cases where sat.granularity is too high; may change testcases for a specific granularity to a multiple of 10 
+inputData$sat.granularity <- ifelse(!is.na(inputData$derivedSvl) & inputData$sat.granularity >= inputData$derivedSvl, MAXINT, inputData$sat.granularity)
+# Remove derived svl
+inputData <- inputData[,1:colCount]
+
+# Determine performance data
 dataPerf <- subset(inputData, type == "performance" & (status == "done" | status == "ootime"))
 dataPerf$isSolved <- dataPerf$status == "done"
 # Penalty for runs with ootime
-dataPerf$time <- ifelse(!dataPerf$isSolved, 1800, dataPerf$time)
+dataPerf$time <- ifelse(dataPerf$isSolved, dataPerf$time, 1800)
 
 # Summarize runs per model and testcase
 dataOverview <- ddply(.parallel=TRUE, dataPerf, c(model, testCase), summarize, timeAvg = mean(time), timeSd = sd(time), solvedCount = sum(ifelse(isSolved,1,0)))
 
 # Extract peaknodes
 dataStat <- subset(inputData, type == "statistics")
-dataStat <- subset(dataStat, select=c(model, testCase, "peak.nodes"))
+dataStat <- ddply(.parallel=TRUE, dataStat, c(model, testCase), summarize, peak.nodes= ifelse(all(is.na(peak.nodes)),NA, min(peak.nodes, na.rm=TRUE)))
 
 # Merge performance summary with peaknodes
 dataOverview <- merge(dataOverview, dataStat, c(model, testCase), all.x=TRUE)
