@@ -23,9 +23,24 @@ def read_dataset(file):
 				labels.append([encode_order(row[13]), encode_sat(row[14]), encode_gran(row[15])])
 	return DataSet(ids, features, labels)
 
+class ResultSet:
+	def __init__(self, idList, predictList, actualList):
+		self.id = idList
+		self.predict = predictList
+		self.actual = actualList
+		
 # Writes data to filesystem
-def write_dataset(data, file):
-	pass
+def write_resultset(data, file):
+	with open(file, 'w') as csvfile:
+		file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+		# Header
+		file_writer.writerow(["filename", "filetype", "predict-order", "predict-saturation", "predict-sat-granularity", "actual-order", "actual-saturation", "actual-sat-granularity"])
+		# Data
+		ids = data.id
+		predict = data.predict
+		actual = data.actual
+		for row in range(len(ids)):
+			file_writer.writerow(ids[row]+ decode_all(predict[row]) + decode_all(actual[row]))
 
 # Encodes order into real value
 def encode_order(text):
@@ -71,6 +86,10 @@ def encode_gran(text):
 	else: # assuming none
 		value = 1
 	return value
+
+# Translates a order,saturation,sat.granularity value triple to readable text
+def decode_all(triple):
+	return [decode_order(triple[0]), decode_sat(triple[1]), decode_gran(triple[2])]
 
 # Translates the value for order into text
 def decode_order(value):
