@@ -116,3 +116,16 @@ def decode_array(value, array):
 # Converts float to integer
 def float_2_int(value):
 	return int(round(value))
+
+# UNUSED
+def zipArray(array2D):
+	array = []
+	for row in range(len(array2D)):
+		entry = ""
+		vals = array2D[row]
+		for col in range(len(vals)):
+			entry += vals[col] + " "
+		array.append(entry[0:-1])
+	return array
+	
+	

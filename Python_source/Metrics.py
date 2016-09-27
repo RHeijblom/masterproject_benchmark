@@ -9,6 +9,7 @@ class ConfusionMatrix:
 		self.sub = []
 		
 	def createSubMatrices(self):
+		self.sub = []
 		for group in range(self.size):
 			tp = self.matrix[group][group]
 			fp = sum(self.matrix[group]) - tp
@@ -20,15 +21,31 @@ class ConfusionMatrix:
 			
 	def recallMacro(self):
 		val = 0.0
+		n = self.size
+		result = "NaN"
 		for matrix in self.sub:
-			val += matrix.recall()
-		return val / self.size
+			recall = matrix.recall()
+			if recall != "NaN":
+				val += recall
+			else:
+				n -= 1
+		if n > 0:
+			result = val /n
+		return result
 	
 	def precisionMacro(self):
 		val = 0.0
+		n = self.size
+		result = "NaN"
 		for matrix in self.sub:
-			val += matrix.precision()
-		return val / self.size
+			precision = matrix.precision()
+			if precision != "NaN":
+				val += precision
+			else:
+				n -= 1
+		if n > 0:
+			result = val /n
+		return result
 	
 	def accuracyMacro(self):
 		val = 0.0
@@ -50,11 +67,49 @@ class ConfusionMatrix2D:
 		self.tn = true_neg
 		
 	def recall(self):
-		return (1.0*self.tp) / (self.tp + self.fn)
+		result = "NaN"
+		denom = self.tp + self.fn
+		if denom > 0:
+			result = (1.0*self.tp) / denom
+		return result
 	
 	def precision(self):
-		return (1.0*self.tp) / (self.tp + self.fp)
+		result = "NaN"
+		denom = self.tp + self.fp
+		if denom > 0:
+			result = (1.0*self.tp) / denom
+		return result
 	
 	def accuracy(self):
 		t = self.tp + self.tn + 0.0
 		return t / (t + self.fp + self.fn)
+
+# Print function for matrix statistics
+def printConfusionMatrix(header, matrix):
+	# Basic stats:
+	print header+":"
+	print ""
+	# print matrix.matrix
+	print "Groups:", matrix.index
+	print "Number of groups:", matrix.size
+	print "Number of tests:", matrix.quantity
+	# Advanced stats:
+	matrix.createSubMatrices()
+	print ""
+	print "Recall (macro)   :", matrix.recallMacro()
+	print "Precision (macro):", matrix.precisionMacro()
+	print "Accuracy (macro) :", matrix.accuracyMacro()
+	print "Accuracy (micro) :", matrix.accuracyMicro()
+	print ""
+	
+# Print function for matrix statistics (one liner for easy ctrl+C, ctrl+V)
+def printConfusionMatrixCompact(matrix):
+	matrix.createSubMatrices()
+	print matrix.recallMacro(),
+	print "\t",
+	print matrix.precisionMacro(),
+	print "\t",
+	print matrix.accuracyMacro(),
+	print "\t",
+	print matrix.accuracyMicro(),
+	print "\t",
