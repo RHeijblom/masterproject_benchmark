@@ -18,9 +18,20 @@ labels = inboxLabels(dataSet.labels)
 # Select classifier
 from sklearn import tree
 from sklearn import neighbors
+from sklearn import naive_bayes
+from sklearn import svm
+from sklearn import linear_model
 #classifier = tree.DecisionTreeClassifier()
-classifier = neighbors.KNeighborsClassifier()
+#classifier = neighbors.KNeighborsClassifier()
 #classifier = neighbors.RadiusNeighborsClassifier(radius=100000000.0)
+#classifier = naive_bayes.GaussianNB()
+#classifier = naive_bayes.MultinomialNB()
+#classifier = naive_bayes.BernoulliNB()
+#classifier = svm.LinearSVC()
+classifier = svm.SVC(kernel="poly", degree=3, decision_function_shape=None)
+#classifier = svm.SVC(kernel="sigmoid", decision_function_shape="ovr")
+#classifier = svm.NuSVC()
+#classifier = linear_model.SGDClassifier()
 
 # Train classifier
 classifier = classifier.fit(features, labels)

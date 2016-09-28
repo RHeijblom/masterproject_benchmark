@@ -12,7 +12,7 @@ labels = dataSet.labels
 from sklearn import tree
 from sklearn import neighbors
 #classifier = tree.DecisionTreeClassifier()
-classifier = neighbors.KNeighborsClassifier()
+classifier = neighbors.KNeighborsClassifier(n_neighbors=6, weights="distance", leaf_size=50)
 #classifier = neighbors.RadiusNeighborsClassifier(radius=100000000.0)
 
 # Train classifier
