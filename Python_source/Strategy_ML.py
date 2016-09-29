@@ -1,7 +1,7 @@
 # Prepare training data
 
 directory = "/home/richard/Project/masterproject_benchmark/R_source/Models/Time/"
-setNo = "3"
+setNo = "2"
 
 import DataUtils
 dataSet = DataUtils.read_dataset(directory +"Set-"+ setNo +"-train.csv")
@@ -12,7 +12,7 @@ labels = dataSet.labels
 from sklearn import tree
 from sklearn import neighbors
 #classifier = tree.DecisionTreeClassifier()
-classifier = neighbors.KNeighborsClassifier(n_neighbors=6, weights="distance", leaf_size=50)
+classifier = neighbors.KNeighborsClassifier(n_neighbors=6, weights="uniform")
 #classifier = neighbors.RadiusNeighborsClassifier(radius=100000000.0)
 
 # Train classifier

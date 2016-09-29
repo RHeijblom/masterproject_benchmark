@@ -1,7 +1,7 @@
 # Prepare training data
 
 directory = "/home/richard/Project/masterproject_benchmark/R_source/Models/Time/"
-setNo = "3"
+setNo = "5"
 
 import DataUtils
 dataSet = DataUtils.read_dataset(directory +"Set-"+ setNo +"-train.csv")
@@ -28,7 +28,7 @@ from sklearn import linear_model
 #classifier = naive_bayes.MultinomialNB()
 #classifier = naive_bayes.BernoulliNB()
 #classifier = svm.LinearSVC()
-classifier = svm.SVC(kernel="poly", degree=3, decision_function_shape=None)
+classifier = svm.SVC()
 #classifier = svm.SVC(kernel="sigmoid", decision_function_shape="ovr")
 #classifier = svm.NuSVC()
 #classifier = linear_model.SGDClassifier()
