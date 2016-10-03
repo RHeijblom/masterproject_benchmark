@@ -1,14 +1,16 @@
 import csv
 
 class DataSet:
-	def __init__(self, idList, featureList, labelList):
+	def __init__(self, idList, namesList, featureList, labelList):
 		self.id = idList
+		self.names = namesList
 		self.features = featureList
 		self.labels = labelList		
 
 # Read dataset from .csv file
 def read_dataset(file):
 	ids = []
+	names = []
 	features = []
 	labels = []
 	with open(file, 'rb') as csvfile:
@@ -16,12 +18,13 @@ def read_dataset(file):
 		is_header = True
 		for row in file_reader:
 			if is_header:
+				names = row[2:13]
 				is_header = False
 			else:
 				ids.append(row[0:2])
 				features.append(row[2:13])
 				labels.append([encode_order(row[13]), encode_sat(row[14]), encode_gran(row[15])])
-	return DataSet(ids, features, labels)
+	return DataSet(ids, names, features, labels)
 
 class ResultSet:
 	def __init__(self, idList, predictList, actualList):
@@ -116,6 +119,47 @@ def decode_array(value, array):
 # Converts float to integer
 def float_2_int(value):
 	return int(round(value))
+
+def removeSingleRow(array, row):
+	return array[0:row] + array[row+1:]
+
+def removeSingleColumn(matrix, column):
+	result = []
+	for row in matrix:
+		result.append(removeSingleRow(row, column))
+	return result
+
+# rowList has to be ordered ascending
+def removeMultipleRows(array, rowList):
+	rem = 0
+	result = array[:]
+	for row in rowList:
+		result = removeSingleRow(result, row-rem)
+		rem += 1
+	return result
+
+# columnList has to be ordered ascending
+def removeMultipleColumns(matrix, columnList):
+	result = []
+	for row in matrix:
+		result.append(removeMultipleRows(row, columnList))
+	return result
+	
+# Return all possible combinations of r element of the given array
+def nPrCombinations(array, r):
+	result = []
+	if len(array) == r:
+		result = [array[:]]
+	elif r == 0:
+		result = [[]]
+	else:
+		elem = array[0:1]
+		withFirstElem = nPrCombinations(array[1:], r-1)
+		withoutFirstElem = nPrCombinations(array[1:], r)
+		for index in range(len(withFirstElem)):
+			result.append(elem + withFirstElem[index])
+		result += withoutFirstElem
+	return result
 
 # UNUSED
 def zipArray(array2D):

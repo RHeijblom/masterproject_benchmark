@@ -23,6 +23,7 @@ perfData <- read.csv(file=args[3], sep=',', quote="\"")
 
 model <- c("filename","filetype")
 strat <- c("order","saturation","sat.granularity")
+mark <- "memMark"
 
 # Add state.vector.length to result in order to fix sat.granularity later on
 testData <- testData[,c(model, "state.vector.length")]
@@ -35,9 +36,10 @@ metrics <- function(metricData){
 	metricData$sat.granularity <- ifelse(is.na(metricData$state.vector.length) | is.na(metricData$sat.granularity) | metricData$state.vector.length > metricData$sat.granularity, metricData$sat.granularity, 2147483647)
 	metricData <- merge(metricData, perfData, c(model, strat), all.x=TRUE)
 	total <- nrow(metricData)
-	metricData$isSolved <- !is.na(metricData$solvedCount) & metricData$solvedCount > 0
+	#metricData$isSolved <- !is.na(metricData$solvedCount) & metricData$solvedCount > 0 # TIME
+	metricData$isSolved <- !is.na(metricData$memMark) & metricData$solvedCount > 0 # PEAKSIZE
 	metricData <- subset(metricData, isSolved)
-	return(c(nrow(metricData), total, mean(metricData[,"timeMark"])))
+	return(c(nrow(metricData), total, mean(metricData[,mark])))
 }
 
 # The metrics for the classifier

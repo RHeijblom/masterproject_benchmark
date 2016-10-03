@@ -44,7 +44,7 @@ class ConfusionMatrix:
 			else:
 				n -= 1
 		if n > 0:
-			result = val /n
+			result = val / n
 		return result
 	
 	def accuracyMacro(self):

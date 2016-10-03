@@ -1,7 +1,7 @@
 # Prepare training data
 
-directory = "/home/richard/Project/masterproject_benchmark/R_source/Models/Time/"
-setNo = "5"
+directory = "/home/richard/Project/masterproject_benchmark/R_source/Models/Peaksize/"
+setNo = "1"
 
 import DataUtils
 dataSet = DataUtils.read_dataset(directory +"Set-"+ setNo +"-train.csv")
