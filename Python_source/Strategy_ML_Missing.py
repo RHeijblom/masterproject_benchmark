@@ -1,6 +1,6 @@
 # Prepare training data
 
-directory = "/home/richard/Project/masterproject_benchmark/R_source/Models/Peaksize/"
+directory = "/home/richard/Project/masterproject_benchmark/R_source/Models/Time/"
 
 import DataUtils
 from sklearn import svm
@@ -11,7 +11,7 @@ def inboxLabels(labels):
 			labels[row] = 100*labels[row][0] + 10*labels[row][1] + labels[row][2]
 		return labels
 	
-missingCount = 8
+missingCount = 4
 
 for setNo in range(3,6):
 	setNo = str(setNo)
